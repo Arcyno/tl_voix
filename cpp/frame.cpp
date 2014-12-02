@@ -1,6 +1,7 @@
 #include "frame.h"
 #include "../lib/include/aquila/transform/Mfcc.h"
 #include <iostream>
+#include "debug.h"
 
 	Frame::Frame(){
 		taille = 0;
@@ -26,6 +27,10 @@
 				autocorr[i-(ordre_lpc+1)] += signal[j] * signal[taille +j-i-1];
 			}
 		}
+
+
+		///////////// test en cours
+		std::cout << "Contenu de autocorr : " << autocorr[0];
 
 		double tmp = -autocorr[1]/autocorr[0];
 		lpc[0]=(tmp);

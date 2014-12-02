@@ -3,14 +3,8 @@
 #include <stdio.h>
 #include <iostream>
 
+// test autocorr et pb debug.h
 
-std::ostream& operator<<( std::ostream &out, const double* tab){
-	out << std::endl << "10 premiers éléments du tableau : " << std::endl;
-	for(int i=0; i<10; ++i){
-		out << tab[i] << std::endl;
-	}
-	return out ;
-}
 
 int main(int argc, char *argv[]) {
 
@@ -34,16 +28,16 @@ int main(int argc, char *argv[]) {
 	
 	std::cout << "f_ech = " << f_ech << std::endl;
 
-	int frames_length = 20;
+	int frames_length = 320;
 	double data[frames_length];
 	sf_read_double (infile, data, frames_length) ;
 	sf_close(infile);
-	for(int i=0; i<frames_length; ++i){
-		std::cout << "data(" << i << ") = "<< data[i] << std::endl;
-	}
+	//for(int i=0; i<frames_length; ++i){
+	//	std::cout << "data(" << i << ") = "<< data[i] << std::endl;
+	//}
 	
     Frame frame = Frame(data, frames_length, ordre_lpc, nb_mfcc);
-    std::cout << "résultat lpc " << frame.get_lpc();
+    std::cout << "Contenu de lpc : " << frame.get_lpc();
 
 	return -1;
 }

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 
 
@@ -18,8 +19,6 @@ public:
 	Frame(); //constructeur par défaut
 
 	Frame(double* signal_donne, int taille_donne, int ordre_lpc, int nb_mfcc);
-
-	//std::ostream& operator<<(std::ostream &out, const double* tab);
 
 	double* get_lpc();
 
