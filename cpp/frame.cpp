@@ -1,5 +1,6 @@
 #include "frame.h"
 #include "../lib/include/aquila/transform/Mfcc.h"
+#include <iostream>
 
 	Frame::Frame(){
 		taille = 0;
@@ -14,12 +15,13 @@
 	}
 
 	void Frame::set_lpc(int ordre_lpc){
+
 		lpc = new double[ordre_lpc]; 
 		double autocorr[taille - ordre_lpc];
 
 
 		for(int i = ordre_lpc+1; i < taille; i++){
-			autocorr[i] = 0;
+			autocorr[i-(ordre_lpc+1)] = 0;
 			for(int j = ordre_lpc+1; j <= i ; j++){
 				autocorr[i-(ordre_lpc+1)] += signal[j] * signal[taille +j-i-1];
 			}
@@ -43,6 +45,7 @@
 
         	sigma2 *=  (1 - tmp*tmp);
 		}
+
 	}
 
 	void Frame::set_mfcc(int nb_mfcc){
