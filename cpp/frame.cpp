@@ -20,17 +20,19 @@
 		lpc = new double[ordre_lpc]; 
 		double autocorr[taille - ordre_lpc];
 
-
+		std::cout << "taille : " << taille;
 		for(int i = ordre_lpc+1; i < taille; i++){
 			autocorr[i-(ordre_lpc+1)] = 0;
-			for(int j = ordre_lpc+1; j <= i ; j++){
+			for(int j = 0; j <= i ; j++){
+				if (i == 25)
+				std::cout << "signal decale : " << signal[taille +j-i-1] << std::endl;
 				autocorr[i-(ordre_lpc+1)] += signal[j] * signal[taille +j-i-1];
 			}
-		}
+  		}
 
 
 		///////////// test en cours
-		std::cout << "Contenu de autocorr : " << autocorr[0];
+		std::cout << "Contenu de autocorr : " << autocorr;
 
 		double tmp = -autocorr[1]/autocorr[0];
 		lpc[0]=(tmp);

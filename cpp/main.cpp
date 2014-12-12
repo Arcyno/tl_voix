@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 	//}
 	
     Frame frame = Frame(data, frames_length, ordre_lpc, nb_mfcc);
-    std::cout << "Contenu de lpc : " << frame.get_lpc();
+    std::cout << "Contenu de lpc : " << frame.get_lpc() << std::endl;
 
 	return -1;
 }
