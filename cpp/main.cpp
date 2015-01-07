@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <iostream>
 
-// test autocorr et pb debug.h
-
 
 int main(int argc, char *argv[]) {
 
