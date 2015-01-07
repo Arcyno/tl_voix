@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 	
 	std::cout << "f_ech = " << f_ech << std::endl;
 
-	int frames_length = 320;
+	int frames_length = 256;
 	double data[frames_length];
 	sf_read_double (infile, data, frames_length) ;
 	sf_close(infile);
@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
 	//	std::cout << "data(" << i << ") = "<< data[i] << std::endl;
 	//}
 	
-    Frame frame = Frame(data, frames_length, ordre_lpc, nb_mfcc);
-    std::cout << "Contenu de lpc : " << frame.get_lpc() << std::endl;
+    Frame frame = Frame(data, frames_length, f_ech, ordre_lpc, nb_mfcc);
+    // std::cout << "Contenu de lpc : " << frame.get_lpc() << std::endl;
 
 	return -1;
 }

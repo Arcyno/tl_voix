@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-std::ostream& operator<<( std::ostream &out, const double* tab){
+std::ostream& operator<<( std::ostream &out, const float* tab){
 	out << std::endl << "10 premiers éléments du tableau : " << std::endl;
 	for(int i=0; i<10; ++i){
 		out << tab[i] << std::endl;
