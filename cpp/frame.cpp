@@ -5,6 +5,7 @@
 #include <string.h>
 #include <math.h>
 #include "libmfcc.c"
+#include <time.h>
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
 #define pi 3.14159265358979323846264338327
@@ -17,11 +18,24 @@ Frame::Frame(){
 
 
 Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_lpc, int nb_mfcc){
-	signal = signal_donne;
+	clock_t t;
+   time_t t0 = clock();
+
+   double signal[taille_donne];
+   memcpy(signal, signal_donne, sizeof signal_donne);
+   time_t t1 = clock();
+
 	taille = taille_donne;
 	f_ech = f_ech_donne;
 	set_lpc(ordre_lpc);
+   time_t t2 = clock();
+
 	set_mfcc(nb_mfcc);
+   time_t t3 = clock();
+
+   //std::cout << "time_copy = " << (t1-t0) << std::endl;
+   //std::cout << "time_lpc = " << (t2-t1) << std::endl;
+   //std::cout << "time_mfcc = " << (t3-t2) << std::endl;
 }
 
 
@@ -38,8 +52,6 @@ void Frame::set_lpc(int ordre_lpc){
 			autocorr[i] += signal[j] * signal[j + i] / taille;
 		}
 	}
-  		// std::cout << "Contenu de autocorr : " << autocorr << std::endl;
-
 
 	double tmp = -autocorr[1]/autocorr[0];
 	lpc[0]=(tmp);
@@ -60,11 +72,13 @@ void Frame::set_lpc(int ordre_lpc){
 		lpc[k-1] = tmp;
 		sigma2 *=  (1 - tmp*tmp);
 	}
-		// std::cout << "Contenu de lpc : " << lpc << std::endl;
 }
 
 
 void Frame::set_mfcc(int nb_mfcc){
+
+   clock_t t;
+   time_t t0 = clock();
 
 	float fft[taille];
 	float data_im[taille];
@@ -72,23 +86,30 @@ void Frame::set_mfcc(int nb_mfcc){
 		fft[i] = signal[i];
 		data_im[i] = 0;
 	}
+   time_t t1 = clock();
 
 	FFT(-1, 8, fft, data_im);
 	double fft2[taille];
 	for(int i=0; i < taille; i++){
 		// Normalisation
 		fft[i] = sqrt(fft[i]*fft[i] + data_im[i]*data_im[i]);
-		//std::cout << "fft_cpp(" <<i+1<<") = " << fft[i] << ";  "<< std::endl;
 		fft2[i] = static_cast<double>(fft[0]);
 	}
+   time_t t2 = clock();
 
 	// Compute the first 40 coefficients
 	double mfcc_result;
 	int coeff;
 	for(coeff = 0; coeff < nb_mfcc; coeff++){
+      time_t t4 = clock();
 		mfcc_result = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
-		printf("%i %f\n", coeff, mfcc_result);
+      time_t t5 = clock();
+      std::cout << "time_unique_coeffs = " << (t5-t4) << std::endl;
 	}
+   time_t t3 = clock();
+
+   std::cout << "time_fft = " << (t2-t1) << std::endl;
+   std::cout << "time_coeffs = " << (t3-t2) << std::endl;
 }
 
 double* Frame::get_lpc(){

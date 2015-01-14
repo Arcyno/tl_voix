@@ -2,7 +2,8 @@
 #include <sndfile.h>
 #include <stdio.h>
 #include <iostream>
-
+#include <list>
+// cool tout fonctionne mais mfcc trop long
 
 int main(int argc, char *argv[]) {
 
@@ -28,14 +29,26 @@ int main(int argc, char *argv[]) {
 
 	int frames_length = 256;
 	double data[frames_length];
-	sf_read_double (infile, data, frames_length) ;
+	std::list<Frame> frames;
+	int nb_frames = 0;
+
+	while(frames_length == sf_read_double (infile, data, frames_length)){
+		nb_frames++;
+		Frame frame = Frame(data, frames_length, f_ech, ordre_lpc, nb_mfcc);
+		frames.push_back(frame);
+		//std::cout<< "dernier point de la frame n°" << nb_frames << " : " << data[frames_length-1] << std::endl;
+	}
+	std::cout<< "nb_frames = " << nb_frames << std::endl;
+
+
 	sf_close(infile);
 	//for(int i=0; i<frames_length; ++i){
 	//	std::cout << "data(" << i << ") = "<< data[i] << std::endl;
 	//}
 	
-    Frame frame = Frame(data, frames_length, f_ech, ordre_lpc, nb_mfcc);
-    // std::cout << "Contenu de lpc : " << frame.get_lpc() << std::endl;
+
+
+    
 
 	return -1;
 }
