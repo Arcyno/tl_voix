@@ -4,6 +4,7 @@
 #include "debug.h"
 #include <string.h>
 #include <math.h>
+#include "libmfcc.c"
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
 #define pi 3.14159265358979323846264338327
@@ -64,124 +65,114 @@ void Frame::set_lpc(int ordre_lpc){
 
 
 void Frame::set_mfcc(int nb_mfcc){
-		//création du tableau de données en cplxe
-		//les index pairs correspondent aux réels
 
-	float signal_cpx[taille*2];
-	for(int i=0; i < taille; i++){
-		signal_cpx[2*i]=signal[i];
-		signal_cpx[2*i+1]=0;
+	float fft[taille];
+	float data_im[taille];
+	for(int i = 0 ;i < taille ; i++){
+		fft[i] = signal[i];
+		data_im[i] = 0;
 	}
-	float* fft = ComplexFFT(signal_cpx,taille,f_ech,1);
-		//normalisation
+
+	FFT(-1, 8, fft, data_im);
+	double fft2[taille];
 	for(int i=0; i < taille; i++){
-		fft[i]=sqrt(fft[2*i]*fft[2*i]+fft[2*i+1]*fft[2*i+1]);
-		std::cout << "ff_cpp(" <<i+1<<") = " << fft[i] << ";"<< std::endl;
+		// Normalisation
+		fft[i] = sqrt(fft[i]*fft[i] + data_im[i]*data_im[i]);
+		//std::cout << "fft_cpp(" <<i+1<<") = " << fft[i] << ";  "<< std::endl;
+		fft2[i] = static_cast<double>(fft[0]);
 	}
-	// std::cout << "COUCOU fft : " << fft << std::endl;
+
+	// Compute the first 40 coefficients
+	double mfcc_result;
+	int coeff;
+	for(coeff = 0; coeff < nb_mfcc; coeff++){
+		mfcc_result = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
+		printf("%i %f\n", coeff, mfcc_result);
+	}
 }
 
 double* Frame::get_lpc(){
-
-
 	return lpc;
 }
 
 double* Frame::get_mfcc(){
-
 	return mfcc;
 }
 
-float* Frame::ComplexFFT(float data[], unsigned long number_of_samples, unsigned int sample_rate, int sign)
+
+/*
+   This computes an in-place complex-to-complex FFT 
+   x and y are the real and imaginary arrays of 2^m points.
+   dir =  1 gives forward transform
+   dir = -1 gives reverse transform 
+*/
+int Frame::FFT(int dir,long m,float *x,float *y)
 {
+   long n,i,i1,j,k,i2,l,l1,l2;
+   float c1,c2,tx,ty,t1,t2,u1,u2,z;
 
-	//variables for the fft
-	unsigned long n,mmax,m,j,istep,i;
-	double wtemp,wr,wpr,wpi,wi,theta,tempr,tempi;
+   /* Calculate the number of points */
+   n = 1;
+   for (i=0;i<m;i++) 
+      n *= 2;
 
-	//the complex array is real+complex so the array 
-    //as a size n = 2* number of complex samples
-    //real part is the data[index] and 
-    //the complex part is the data[index+1]
+   /* Do the bit reversal */
+   i2 = n >> 1;
+   j = 0;
+   for (i=0;i<n-1;i++) {
+      if (i < j) {
+         tx = x[i];
+         ty = y[i];
+         x[i] = x[j];
+         y[i] = y[j];
+         x[j] = tx;
+         y[j] = ty;
+      }
+      k = i2;
+      while (k <= j) {
+         j -= k;
+         k >>= 1;
+      }
+      j += k;
+   }
 
-	//new complex array of size n=2*sample_rate
-	float* vector=new float [2*sample_rate];
+   /* Compute the FFT */
+   c1 = -1.0; 
+   c2 = 0.0;
+   l2 = 1;
+   for (l=0;l<m;l++) {
+      l1 = l2;
+      l2 <<= 1;
+      u1 = 1.0; 
+      u2 = 0.0;
+      for (j=0;j<l1;j++) {
+         for (i=j;i<n;i+=l2) {
+            i1 = i + l1;
+            t1 = u1 * x[i1] - u2 * y[i1];
+            t2 = u1 * y[i1] + u2 * x[i1];
+            x[i1] = x[i] - t1; 
+            y[i1] = y[i] - t2;
+            x[i] += t1;
+            y[i] += t2;
+         }
+         z =  u1 * c1 - u2 * c2;
+         u2 = u1 * c2 + u2 * c1;
+         u1 = z;
+      }
+      c2 = sqrt((1.0 - c1) / 2.0);
+      if (dir == 1) 
+         c2 = -c2;
+      c1 = sqrt((1.0 + c1) / 2.0);
+   }
 
-	//put the real array in a complex array
-	//the complex part is filled with 0's
-	//the remaining vector with no data is filled with 0's
-	for(n=0; n<sample_rate;n++)
-	{
-		if(n<number_of_samples)
-			vector[2*n]=data[n];
-		else
-			vector[2*n]=0;
-		vector[2*n+1]=0;
-	}
-
-	//binary inversion (note that the indexes 
-    //start from 0 witch means that the
-    //real part of the complex is on the even-indexes 
-    //and the complex part is on the odd-indexes)
-	n=sample_rate << 1;
-	j=0;
-	for (i=0;i<n/2;i+=2) {
-		if (j > i) {
-			SWAP(vector[j],vector[i]);
-			SWAP(vector[j+1],vector[i+1]);
-			if((j/2)<(n/4)){
-				SWAP(vector[(n-(i+2))],vector[(n-(j+2))]);
-				SWAP(vector[(n-(i+2))+1],vector[(n-(j+2))+1]);
-			}
-		}
-		m=n >> 1;
-		while (m >= 2 && j >= m) {
-			j -= m;
-			m >>= 1;
-		}
-		j += m;
-	}
-	//end of the bit-reversed order algorithm
-
-	//Danielson-Lanzcos routine
-	mmax=2;
-	while (n > mmax) {
-		istep=mmax << 1;
-		theta=sign*(2*pi/mmax);
-		wtemp=sin(0.5*theta);
-		wpr = -2.0*wtemp*wtemp;
-		wpi=sin(theta);
-		wr=1.0;
-		wi=0.0;
-		for (m=1;m<mmax;m+=2) {
-			for (i=m;i<=n;i+=istep) {
-				j=i+mmax;
-				tempr=wr*vector[j-1]-wi*vector[j];
-				tempi=wr*vector[j]+wi*vector[j-1];
-				vector[j-1]=vector[i-1]-tempr;
-				vector[j]=vector[i]-tempi;
-				vector[i-1] += tempr;
-				vector[i] += tempi;
-			}
-			wr=(wtemp=wr)*wpr-wi*wpi+wr;
-			wi=wi*wpr+wtemp*wpi+wi;
-		}
-		mmax=istep;
-	}
-	//end of the algorithm
-	
-	//determine the fundamental frequency
-	//look for the maximum absolute value in the complex array
-	auto fundamental_frequency=0;
-	for(i=2; i<=sample_rate; i+=2)
-	{
-		if((pow(vector[i],2)+pow(vector[i+1],2))>(pow(vector[fundamental_frequency],2)+pow(vector[fundamental_frequency+1],2))){
-			fundamental_frequency=i;
-		}
-	}
-
-	//since the array of complex has the format [real][complex]=>[absolute value]
-	//the maximum absolute value must be ajusted to half
-	fundamental_frequency=(long)floor((float)fundamental_frequency/2);
-	return vector;
+   /* Scaling for forward transform */
+   if (dir == 1) {
+      for (i=0;i<n;i++) {
+         x[i] /= n;
+         y[i] /= n;
+      }
+   }
+   
+   return(1);
 }
+

@@ -15,7 +15,7 @@ private:
 
 	void set_mfcc(int nb_mfcc);
 
-	float* ComplexFFT(float data[], unsigned long number_of_samples, unsigned int sample_rate, int sign);
+	int FFT(int dir,long m,float *x,float *y);
 
 public:
 
