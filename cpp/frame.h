@@ -1,11 +1,11 @@
 #pragma once
 
 #include <iostream>
-
+#define TAILLE_FRAME 256
 
 class Frame {
 private:
-	double* signal;
+	double signal[TAILLE_FRAME];
 	int taille;
 	double* lpc;
 	double mfcc[];
@@ -28,5 +28,7 @@ public:
 	double* get_lpc();
 
 	double* get_mfcc();
+
+	double* get_signal();
 
 };

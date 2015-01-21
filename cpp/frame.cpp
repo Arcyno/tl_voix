@@ -4,7 +4,6 @@
 #include <math.h>
 #include "libmfcc.c"
 #include <time.h>
-#include "debug.h"
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
 #define pi 3.14159265358979323846264338327
@@ -16,36 +15,28 @@ Frame::Frame(){
 
 
 Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_lpc, int nb_mfcc){
-   clock_t t;
-   time_t t0 = clock();
 
-   double signal2[taille_donne];
-   memcpy(signal2, signal_donne, taille_donne);
-   signal = signal2;
-
-   time_t t1 = clock();
+   // double signal2[taille_donne];
+   memcpy(signal, signal_donne, taille_donne);
+   // signal = signal2;
 
 	taille = taille_donne;
 	f_ech = f_ech_donne;
 
 	set_lpc(ordre_lpc);
-   time_t t2 = clock();
+   // std::cout << "lpc "<< lpc[0] << std::endl;
+
 
 	set_mfcc(nb_mfcc);
-   time_t t3 = clock();
 
    n_lpc = ordre_lpc;
    n_mfcc = nb_mfcc;
-
-   //std::cout << "time_copy = " << (t1-t0) << std::endl;
-   //std::cout << "time_lpc = " << (t2-t1) << std::endl;
-   //std::cout << "time_mfcc = " << (t3-t2) << std::endl;
 }
 
 
 void Frame::set_lpc(int ordre_lpc){
 
-	lpc = new double[ordre_lpc]; 
+	double* lpc2 = new double[ordre_lpc]; 
 	double lpc_up[ordre_lpc]; 
 	double autocorr[taille - ordre_lpc];
 
@@ -59,24 +50,25 @@ void Frame::set_lpc(int ordre_lpc){
 	}
 
 	double tmp = -autocorr[1]/autocorr[0];
-	lpc[0]=(tmp);
+	lpc2[0]=(tmp);
 	double sigma2 = (1 - tmp*tmp) * autocorr[0];
 
 	for(int k = 2; k< ordre_lpc; k++){
 		tmp = autocorr[k];
 
 		for (int j = 1; j < k; ++j){
-			tmp += lpc[j-1]*autocorr[k-j];
+			tmp += lpc2[j-1]*autocorr[k-j];
 		}
 		tmp /= -sigma2;
 
 		for (int j = 1; j < k; ++j){
-			lpc_up[j-1] = lpc[j-1] + tmp*lpc[k-1-j];
+			lpc_up[j-1] = lpc2[j-1] + tmp*lpc2[k-1-j];
 		}
-		memcpy (lpc, lpc_up, sizeof lpc_up);
-		lpc[k-1] = tmp;
+		memcpy (lpc2, lpc_up, sizeof lpc_up);
+		lpc2[k-1] = tmp;
 		sigma2 *=  (1 - tmp*tmp);
 	}
+   lpc = lpc2;
 }
 
 
@@ -125,7 +117,9 @@ double* Frame::get_mfcc(){
 	return mfcc;
 }
 
-
+double* Frame::get_signal(){
+   return signal;
+}
 /*
    This computes an in-place complex-to-complex FFT 
    x and y are the real and imaginary arrays of 2^m points.

@@ -4,7 +4,10 @@
 #include <stdio.h>
 #include <iostream>
 #include <list>
-// cool tout fonctionne mais mfcc trop long
+#include "debug.h"
+// tous les attributs de frame sont des tableaux qui doivent être initialisés 
+// avec leur taille -> utiliser #define... dans un fichier parametres.h inclu partout
+// puis vérifier lpc, mfcc depuis dehors
 
 
 Morceau lecture(char* fileName){
@@ -22,7 +25,7 @@ Morceau lecture(char* fileName){
 	int f_ech = sfinfo.samplerate;
 	int ordre_lpc = 10;
 	int nb_mfcc = 40;	
-	int frames_length = 256;
+	int frames_length = TAILLE_FRAME;
 
 
 	double data[frames_length/2];
@@ -81,10 +84,12 @@ int main(int argc, char *argv[]) {
 	char nom1[] = "../test3/adroite.wav";
 	Morceau m1 = lecture(nom1);
 
-	char nom2[] = "../test3/adroite2.wav";
-	Morceau m2 = lecture(nom2);
+	// char nom2[] = "../test3/adroite2.wav";
+	// Morceau m2 = lecture(nom2);
 
-	double dist = dtw(m1,m2);
+	// double dist = dtw(m1,m2);
+
+	std::cout << "mfcc : " << m1.get_frames()[0].get_signal() << std::endl;
 	
 	return -1;
 }
