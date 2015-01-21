@@ -1,7 +1,5 @@
 #include "frame.h"
-#include "../lib/include/aquila/transform/Mfcc.h"
 #include <iostream>
-#include "debug.h"
 #include <string.h>
 #include <math.h>
 #include "libmfcc.c"
@@ -10,68 +8,67 @@
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
 #define pi 3.14159265358979323846264338327
 
-//probleme fft : on n'a pas la mm chose que matlab (mm pas symétrique ??)
-// attention il faut des puissance de 2 en entrée fft
+
 Frame::Frame(){
 	taille = 0;
 }
 
 
 Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_lpc, int nb_mfcc){
-	clock_t t;
-   time_t t0 = clock();
 
-   double signal[taille_donne];
-   memcpy(signal, signal_donne, sizeof signal_donne);
-   time_t t1 = clock();
+   // double signal2[taille_donne];
+   memcpy(signal, signal_donne, taille_donne);
+   // signal = signal2;
 
 	taille = taille_donne;
 	f_ech = f_ech_donne;
+
 	set_lpc(ordre_lpc);
-   time_t t2 = clock();
+   // std::cout << "lpc "<< lpc[0] << std::endl;
+
 
 	set_mfcc(nb_mfcc);
-   time_t t3 = clock();
 
-   //std::cout << "time_copy = " << (t1-t0) << std::endl;
-   //std::cout << "time_lpc = " << (t2-t1) << std::endl;
-   //std::cout << "time_mfcc = " << (t3-t2) << std::endl;
+   n_lpc = ordre_lpc;
+   n_mfcc = nb_mfcc;
 }
 
 
 void Frame::set_lpc(int ordre_lpc){
 
-	lpc = new double[ordre_lpc]; 
+	double* lpc2 = new double[ordre_lpc]; 
 	double lpc_up[ordre_lpc]; 
 	double autocorr[taille - ordre_lpc];
 
-		// Autocorrélation jusqu'à l'ordre des lpc
+	// Autocorrélation jusqu'à l'ordre des lpc
 	for(int i = 0; i < ordre_lpc; i++){
 		autocorr[i] = 0;
 		for(int j = 0; j <= taille-1-i ; j++){
+         //std::cout << "i " << i << " et j " << j << std::endl;
 			autocorr[i] += signal[j] * signal[j + i] / taille;
 		}
 	}
 
 	double tmp = -autocorr[1]/autocorr[0];
-	lpc[0]=(tmp);
+	lpc2[0]=(tmp);
 	double sigma2 = (1 - tmp*tmp) * autocorr[0];
 
 	for(int k = 2; k< ordre_lpc; k++){
 		tmp = autocorr[k];
 
 		for (int j = 1; j < k; ++j){
-			tmp += lpc[j-1]*autocorr[k-j];
+			tmp += lpc2[j-1]*autocorr[k-j];
 		}
 		tmp /= -sigma2;
 
 		for (int j = 1; j < k; ++j){
-			lpc_up[j-1] = lpc[j-1] + tmp*lpc[k-1-j];
+			lpc_up[j-1] = lpc2[j-1] + tmp*lpc2[k-1-j];
 		}
-		memcpy (lpc, lpc_up, sizeof lpc_up);
-		lpc[k-1] = tmp;
+		memcpy (lpc2, lpc_up, sizeof lpc_up);
+		lpc2[k-1] = tmp;
 		sigma2 *=  (1 - tmp*tmp);
 	}
+   lpc = lpc2;
 }
 
 
@@ -104,12 +101,12 @@ void Frame::set_mfcc(int nb_mfcc){
       time_t t4 = clock();
 		mfcc_result = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
       time_t t5 = clock();
-      std::cout << "time_unique_coeffs = " << (t5-t4) << std::endl;
+      //std::cout << "time_unique_coeffs = " << (t5-t4) << std::endl;
 	}
    time_t t3 = clock();
 
-   std::cout << "time_fft = " << (t2-t1) << std::endl;
-   std::cout << "time_coeffs = " << (t3-t2) << std::endl;
+   //std::cout << "time_fft = " << (t2-t1) << std::endl;
+   //std::cout << "time_coeffs = " << (t3-t2) << std::endl;
 }
 
 double* Frame::get_lpc(){
@@ -120,7 +117,9 @@ double* Frame::get_mfcc(){
 	return mfcc;
 }
 
-
+double* Frame::get_signal(){
+   return signal;
+}
 /*
    This computes an in-place complex-to-complex FFT 
    x and y are the real and imaginary arrays of 2^m points.
