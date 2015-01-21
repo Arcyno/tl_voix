@@ -34,6 +34,9 @@ Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_
 	set_mfcc(nb_mfcc);
    time_t t3 = clock();
 
+   n_lpc = ordre_lpc;
+   n_mfcc = nb_mfcc;
+
    //std::cout << "time_copy = " << (t1-t0) << std::endl;
    //std::cout << "time_lpc = " << (t2-t1) << std::endl;
    //std::cout << "time_mfcc = " << (t3-t2) << std::endl;

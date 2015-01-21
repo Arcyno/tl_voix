@@ -16,4 +16,11 @@ Morceau::Morceau(std::list<Frame> frames_donne, int n_frames_donne){
 	n_frames = n_frames_donne;
 }
 
+int Morceau::get_n_frames(){
+	return n_frames;
+}
+
+Frame* Morceau::get_frames(){
+	return frames;
+}
 

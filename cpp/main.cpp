@@ -51,6 +51,28 @@ Morceau lecture(char* fileName){
 
 
 
+double distance(Frame f1, Frame f2){
+
+
+
+	return 0;
+}
+
+
+
+double dtw(Morceau m1, Morceau m2){
+
+	double distances[m1.get_n_frames()][m2.get_n_frames()];
+	Frame* frames1 = m1.get_frames();
+	Frame* frames2 = m2.get_frames();
+	for(int i = 0; i < m1.get_n_frames(); i++){
+		for(int j = 0; j < m2.get_n_frames() ; j++){
+			distances[i][j] = distance(frames1[i], frames2[j]);
+		}
+	}
+
+	return 0;
+}
 
 
 
@@ -58,6 +80,11 @@ int main(int argc, char *argv[]) {
 
 	char nom1[] = "../test3/adroite.wav";
 	Morceau m1 = lecture(nom1);
+
+	char nom2[] = "../test3/adroite2.wav";
+	Morceau m2 = lecture(nom2);
+
+	double dist = dtw(m1,m2);
 	
 	return -1;
 }

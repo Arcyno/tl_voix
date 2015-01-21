@@ -10,6 +10,8 @@ private:
 	double* lpc;
 	double mfcc[];
 	int f_ech;
+	int n_lpc;
+	int n_mfcc;
 
 	void set_lpc(int ordre_lpc);
 
