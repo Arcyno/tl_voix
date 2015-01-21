@@ -1,32 +1,33 @@
 #include "frame.h"
-#include "../lib/include/aquila/transform/Mfcc.h"
 #include <iostream>
-#include "debug.h"
 #include <string.h>
 #include <math.h>
 #include "libmfcc.c"
 #include <time.h>
+#include "debug.h"
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
 #define pi 3.14159265358979323846264338327
 
-//probleme fft : on n'a pas la mm chose que matlab (mm pas symétrique ??)
-// attention il faut des puissance de 2 en entrée fft
+
 Frame::Frame(){
 	taille = 0;
 }
 
 
 Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_lpc, int nb_mfcc){
-	clock_t t;
+   clock_t t;
    time_t t0 = clock();
 
-   double signal[taille_donne];
-   memcpy(signal, signal_donne, sizeof signal_donne);
+   double signal2[taille_donne];
+   memcpy(signal2, signal_donne, taille_donne);
+   signal = signal2;
+
    time_t t1 = clock();
 
 	taille = taille_donne;
 	f_ech = f_ech_donne;
+
 	set_lpc(ordre_lpc);
    time_t t2 = clock();
 
@@ -45,10 +46,11 @@ void Frame::set_lpc(int ordre_lpc){
 	double lpc_up[ordre_lpc]; 
 	double autocorr[taille - ordre_lpc];
 
-		// Autocorrélation jusqu'à l'ordre des lpc
+	// Autocorrélation jusqu'à l'ordre des lpc
 	for(int i = 0; i < ordre_lpc; i++){
 		autocorr[i] = 0;
 		for(int j = 0; j <= taille-1-i ; j++){
+         //std::cout << "i " << i << " et j " << j << std::endl;
 			autocorr[i] += signal[j] * signal[j + i] / taille;
 		}
 	}
@@ -104,12 +106,12 @@ void Frame::set_mfcc(int nb_mfcc){
       time_t t4 = clock();
 		mfcc_result = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
       time_t t5 = clock();
-      std::cout << "time_unique_coeffs = " << (t5-t4) << std::endl;
+      //std::cout << "time_unique_coeffs = " << (t5-t4) << std::endl;
 	}
    time_t t3 = clock();
 
-   std::cout << "time_fft = " << (t2-t1) << std::endl;
-   std::cout << "time_coeffs = " << (t3-t2) << std::endl;
+   //std::cout << "time_fft = " << (t2-t1) << std::endl;
+   //std::cout << "time_coeffs = " << (t3-t2) << std::endl;
 }
 
 double* Frame::get_lpc(){
