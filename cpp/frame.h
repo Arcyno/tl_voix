@@ -1,14 +1,14 @@
 #pragma once
 
 #include <iostream>
-#define TAILLE_FRAME 256
+#include "parameters.h"
 
 class Frame {
 private:
 	double signal[TAILLE_FRAME];
 	int taille;
-	double* lpc;
-	double mfcc[];
+	double lpc[ORDRE_LPC];
+	double mfcc[NB_MFCC];
 	int f_ech;
 	int n_lpc;
 	int n_mfcc;

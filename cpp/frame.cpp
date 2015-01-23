@@ -36,7 +36,6 @@ Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_
 
 void Frame::set_lpc(int ordre_lpc){
 
-	double* lpc2 = new double[ordre_lpc]; 
 	double lpc_up[ordre_lpc]; 
 	double autocorr[taille - ordre_lpc];
 
@@ -50,25 +49,24 @@ void Frame::set_lpc(int ordre_lpc){
 	}
 
 	double tmp = -autocorr[1]/autocorr[0];
-	lpc2[0]=(tmp);
+	lpc[0]=(tmp);
 	double sigma2 = (1 - tmp*tmp) * autocorr[0];
 
 	for(int k = 2; k< ordre_lpc; k++){
 		tmp = autocorr[k];
 
 		for (int j = 1; j < k; ++j){
-			tmp += lpc2[j-1]*autocorr[k-j];
+			tmp += lpc[j-1]*autocorr[k-j];
 		}
 		tmp /= -sigma2;
 
 		for (int j = 1; j < k; ++j){
-			lpc_up[j-1] = lpc2[j-1] + tmp*lpc2[k-1-j];
+			lpc_up[j-1] = lpc[j-1] + tmp*lpc[k-1-j];
 		}
-		memcpy (lpc2, lpc_up, sizeof lpc_up);
-		lpc2[k-1] = tmp;
+		memcpy (lpc, lpc_up, sizeof lpc_up);
+		lpc[k-1] = tmp;
 		sigma2 *=  (1 - tmp*tmp);
 	}
-   lpc = lpc2;
 }
 
 

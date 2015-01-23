@@ -5,9 +5,11 @@
 #include <iostream>
 #include <list>
 #include "debug.h"
-// tous les attributs de frame sont des tableaux qui doivent être initialisés 
-// avec leur taille -> utiliser #define... dans un fichier parametres.h inclu partout
+#include "parameters.h"
+
+// finir mfcc ? (on n'utilise pas le tableau mfcc !)
 // puis vérifier lpc, mfcc depuis dehors
+// et vérifier résultats avec Ofast.
 
 
 Morceau lecture(char* fileName){
