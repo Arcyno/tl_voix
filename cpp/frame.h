@@ -8,7 +8,7 @@ private:
 	double signal[TAILLE_FRAME];
 	int taille;
 	double lpc[ORDRE_LPC];
-	double mfcc[NB_MFCC];
+	double mfcc [NB_MFCC];
 	int f_ech;
 	int n_lpc;
 	int n_mfcc;

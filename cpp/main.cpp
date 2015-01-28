@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <list>
-#include "debug.h"
 #include "parameters.h"
+#include "debug.h"
 
 // finir mfcc ? (on n'utilise pas le tableau mfcc !)
 // puis vérifier lpc, mfcc depuis dehors
@@ -25,8 +25,8 @@ Morceau lecture(char* fileName){
 	} 	
 	
 	int f_ech = sfinfo.samplerate;
-	int ordre_lpc = 10;
-	int nb_mfcc = 40;	
+	int ordre_lpc = ORDRE_LPC;
+	int nb_mfcc = NB_MFCC;	
 	int frames_length = TAILLE_FRAME;
 
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
 	// double dist = dtw(m1,m2);
 
-	std::cout << "mfcc : " << m1.get_frames()[0].get_signal() << std::endl;
+	std::cout << "mfcc : " << m1.get_frames()[0].get_mfcc() << std::endl;
 	
 	return -1;
 }

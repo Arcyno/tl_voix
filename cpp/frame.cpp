@@ -17,7 +17,7 @@ Frame::Frame(){
 Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_lpc, int nb_mfcc){
 
    // double signal2[taille_donne];
-   memcpy(signal, signal_donne, taille_donne);
+   std::copy(signal_donne, signal_donne + taille_donne, signal);
    // signal = signal2;
 
 	taille = taille_donne;
@@ -25,7 +25,6 @@ Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_
 
 	set_lpc(ordre_lpc);
    // std::cout << "lpc "<< lpc[0] << std::endl;
-
 
 	set_mfcc(nb_mfcc);
 
@@ -50,9 +49,9 @@ void Frame::set_lpc(int ordre_lpc){
 
 	double tmp = -autocorr[1]/autocorr[0];
 	lpc[0]=(tmp);
-	double sigma2 = (1 - tmp*tmp) * autocorr[0];
+	double sigma2 = (1 - tmp*tmp)*autocorr[0];
 
-	for(int k = 2; k< ordre_lpc; k++){
+	for(int k = 2; k< ordre_lpc+1; k++){
 		tmp = autocorr[k];
 
 		for (int j = 1; j < k; ++j){
@@ -65,7 +64,7 @@ void Frame::set_lpc(int ordre_lpc){
 		}
 		memcpy (lpc, lpc_up, sizeof lpc_up);
 		lpc[k-1] = tmp;
-		sigma2 *=  (1 - tmp*tmp);
+		sigma2 *= (1 - tmp*tmp);
 	}
 }
 
@@ -93,11 +92,10 @@ void Frame::set_mfcc(int nb_mfcc){
    time_t t2 = clock();
 
 	// Compute the first 40 coefficients
-	double mfcc_result;
 	int coeff;
 	for(coeff = 0; coeff < nb_mfcc; coeff++){
       time_t t4 = clock();
-		mfcc_result = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
+		mfcc[coeff] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
       time_t t5 = clock();
       //std::cout << "time_unique_coeffs = " << (t5-t4) << std::endl;
 	}
@@ -107,17 +105,22 @@ void Frame::set_mfcc(int nb_mfcc){
    //std::cout << "time_coeffs = " << (t3-t2) << std::endl;
 }
 
+
 double* Frame::get_lpc(){
 	return lpc;
 }
+
 
 double* Frame::get_mfcc(){
 	return mfcc;
 }
 
+
 double* Frame::get_signal(){
    return signal;
 }
+
+
 /*
    This computes an in-place complex-to-complex FFT 
    x and y are the real and imaginary arrays of 2^m points.
