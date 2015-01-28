@@ -51,7 +51,7 @@ void Frame::set_lpc(int ordre_lpc){
 	lpc[0]=(tmp);
 	double sigma2 = (1 - tmp*tmp)*autocorr[0];
 
-	for(int k = 2; k< ordre_lpc+1; k++){
+	for(int k = 2; k< ordre_lpc; k++){
 		tmp = autocorr[k];
 
 		for (int j = 1; j < k; ++j){
@@ -66,6 +66,7 @@ void Frame::set_lpc(int ordre_lpc){
 		lpc[k-1] = tmp;
 		sigma2 *= (1 - tmp*tmp);
 	}
+   lpc[ordre_lpc-1] = 1;
 }
 
 
@@ -96,6 +97,9 @@ void Frame::set_mfcc(int nb_mfcc){
 	for(coeff = 0; coeff < nb_mfcc; coeff++){
       time_t t4 = clock();
 		mfcc[coeff] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
+      if(mfcc[coeff]>1000){
+         std::cout << "mfcc[coeff] = " << mfcc[coeff] << ", indice = " << coeff << std::endl;
+      }
       time_t t5 = clock();
       //std::cout << "time_unique_coeffs = " << (t5-t4) << std::endl;
 	}

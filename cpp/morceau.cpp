@@ -9,7 +9,8 @@ Morceau::Morceau(){
 
 Morceau::Morceau(std::list<Frame> frames_donne, int n_frames_donne){
 	
-	Frame frames2[n_frames_donne];
+	//Frame frames2[n_frames_donne];
+	Frame* frames2 = new Frame[n_frames_donne];
 	copy(frames_donne.begin(), frames_donne.end(), frames2);
 	frames = frames2;
 

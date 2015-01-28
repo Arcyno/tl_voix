@@ -4,8 +4,8 @@
 
 
 std::ostream& operator<<( std::ostream &out, const double* tab){
-	out << std::endl << "15 premiers éléments du tableau : " << std::endl;
-	for(int i=0; i<15; ++i){
+	out << std::endl << "10 premiers éléments du tableau : " << std::endl;
+	for(int i=0; i<10; ++i){
 		out << tab[i] << std::endl;
 	}
 	return out ;
