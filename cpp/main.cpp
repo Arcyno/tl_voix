@@ -58,25 +58,43 @@ Morceau lecture(char* fileName){
 
 double distance(Frame f1, Frame f2){
 
+	double dist = 0;
 
+	double * mfcc1 = f1.get_mfcc();
+	double * mfcc2 = f2.get_mfcc();
+	for(int i = 0; i < NB_MFCC; i++){
+		dist += (mfcc1[i] - mfcc2[i])*(mfcc1[i] - mfcc2[i]);
+	}
+	double * lpc1 = f1.get_lpc();
+	double * lpc2 = f2.get_lpc();
+	for(int i = 0; i < ORDRE_LPC; i++){
+		dist += (lpc1[i] - lpc2[i])*(lpc1[i] - lpc2[i]);
+	}
 
-	return 0;
+	return dist;
 }
 
 
 
 double dtw(Morceau m1, Morceau m2){
 
+	int i = 0;
+	int j = 0;
 	double distances[m1.get_n_frames()][m2.get_n_frames()];
 	Frame* frames1 = m1.get_frames();
 	Frame* frames2 = m2.get_frames();
-	for(int i = 0; i < m1.get_n_frames(); i++){
-		for(int j = 0; j < m2.get_n_frames() ; j++){
-			distances[i][j] = distance(frames1[i], frames2[j]);
+	distances[0][0] = distance(frames1[0], frames2[0]);
+	for(j = 1; j < m2.get_n_frames(); j++){
+		distances[0][j] = distances[0][j-1] + distance(frames1[i], frames2[j]);
+	}
+	for(i = 1; i < m1.get_n_frames(); i++){
+		distances[i][0] = distances[i-1][0] + distance(frames1[i], frames2[0]);
+		for(j = 1; j < m2.get_n_frames(); j++){
+			distances[i][j] = std::min(distances[i-1][j-1],std::min(distances[i-1][j],distances[i][j-1])) + distance(frames1[i], frames2[j]);
 		}
 	}
 
-	return 0;
+	return distances[i][j];
 }
 
 
@@ -86,12 +104,12 @@ int main(int argc, char *argv[]) {
 	char nom1[] = "../test3/adroite.wav";
 	Morceau m1 = lecture(nom1);
 
-	// char nom2[] = "../test3/adroite2.wav";
-	// Morceau m2 = lecture(nom2);
+	char nom2[] = "../test3/adroite2.wav";
+	Morceau m2 = lecture(nom2);
 
-	// double dist = dtw(m1,m2);
+	double dist = dtw(m1,m2);
 
-	std::cout << "mfcc : " << m1.get_frames()[0].get_mfcc() << std::endl;
+	std::cout << "dist : " << dist << std::endl;
 	
 	return -1;
 }
