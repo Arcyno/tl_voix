@@ -7,12 +7,10 @@
 #include "parameters.h"
 #include "debug.h"
 
-// finir mfcc ? (on n'utilise pas le tableau mfcc !)
-// puis vérifier lpc, mfcc depuis dehors
-// et vérifier résultats avec Ofast.
+// faire normalisation et se débrouiller pour avoir une belle classif
 
 
-Morceau lecture(char* fileName){
+Morceau lecture(char* fileName, int classe_donne = 0){
 
 	SF_INFO sfinfo;
 	SNDFILE* infile;
@@ -49,21 +47,18 @@ Morceau lecture(char* fileName){
 
 	sf_close(infile);
 
-	Morceau morceau = Morceau(frames, n_frames);
+	Morceau morceau = Morceau(frames, n_frames, classe_donne);
 	
 	return morceau;
 };
 
 
 
-double distance(Frame f1, Frame f2){
+double distance(Frame &f1, Frame &f2){
 
 	double dist = 0;
 	double * mfcc1 = f1.get_mfcc();
 	double * mfcc2 = f2.get_mfcc();
-	if(mfcc1[1]>1000){
-        std::cout << "mfcc1[1] = " << mfcc1[1] << std::endl;
-    }
 	//std::cout << "mfcc1 : " << mfcc2 << std::endl;
 	for(int i = 0; i < NB_MFCC; i++){
 		dist += (mfcc1[i] - mfcc2[i])*(mfcc1[i] - mfcc2[i]);
@@ -80,7 +75,7 @@ double distance(Frame f1, Frame f2){
 
 
 
-double dtw(Morceau m1, Morceau m2){
+double dtw(Morceau &m1, Morceau &m2){
 
 	int i = 0;
 	int j = 0;
@@ -89,7 +84,9 @@ double dtw(Morceau m1, Morceau m2){
 	Frame* frames2 = m2.get_frames();
 	distances[0][0] = distance(frames1[0], frames2[0]);
 	for(j = 1; j < m2.get_n_frames(); j++){
-		distances[0][j] = distances[0][j-1] + distance(frames1[0], frames2[j]);
+		// distances[0][j] = distances[0][j-1] + distance(frames1[0], frames2[j]);
+			distances[0][j] = 0;
+
 	}
 	for(i = 1; i < m1.get_n_frames(); i++){
 		distances[i][0] = distances[i-1][0] + distance(frames1[i], frames2[0]);
@@ -105,15 +102,37 @@ double dtw(Morceau m1, Morceau m2){
 
 int main(int argc, char *argv[]) {
 
+	// Creation de la base
+	int l_base = 4;
+	Morceau base[l_base];
+
 	char nom1[] = "../test3/adroite.wav";
-	Morceau m1 = lecture(nom1);
+	base[0] = lecture(nom1, 1);
+	char nom2[] = {"../test3/agauche.wav"};
+	base[1] = lecture(nom2, 2);
+	char nom3[] = "../test3/enavant.wav";
+	base[2] = lecture(nom3, 3);
+	char nom4[] = "../test3/stop.wav";
+	base[3] = lecture(nom4, 4);
 
-	char nom2[] = "../test3/adroite2.wav";
-	Morceau m2 = lecture(nom2);
 
-	double dist = dtw(m1,m2);
+	char nom0[] = "../test3/adroite2.wav";
+	Morceau m2 = lecture(nom0);
 
-	std::cout << "dist : " << dist << std::endl;
+	double dist = dtw(m2, base[0]);
+	double cl = base[0].get_classe();
+	std::cout << "classe : " << cl << ", distance : " << dist << std::endl;
+	double temp = 0;
+	for (int i = 1; i < l_base; i++){
+		temp = dtw(m2, base[i]);
+		std::cout << "classe : " << base[i].get_classe() << ", distance : " << temp << std::endl;
+		if(temp < dist){
+			dist = temp;
+			cl = base[i].get_classe();
+		}
+	}
+
+	std::cout << "classe choisie : " << cl << std::endl;
 	
 	return -1;
 }
