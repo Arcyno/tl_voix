@@ -144,29 +144,8 @@ int classif(Morceau* base, int l_base, char* nom, int k){
 			}
 		}
 
-		// for (int i = 0; i < k; i++){
-		// 	std::cout << "bouckle " << hashmap.end()->first << std::endl;
-		// 	classes[hashmap.end()->second-1] += 1;
-		// 	hashmap.erase(hashmap.end()->first);
-		// }
-
-
-
-
-		// double dist = dtw(m, base[0]);
-		// int cl = base[0].get_classe();
-		// std::cout << "classe : " << cl << ", distance : " << dist << std::endl;
-		// double temp = 0;
-		// for (int i = 1; i < l_base; i++){
-		// 	temp = dtw(m, base[i]);
-		// 	std::cout << "classe : " << base[i].get_classe() << ", distance : " << temp << std::endl;
-		// 	if(temp < dist){
-		// 		dist = temp;
-		// 		cl = base[i].get_classe();
-		// 	}
-		// }
 		std::cout << "----- oups -----" << std::endl;
-		return 0;
+		return -1;
 }
 
 
@@ -213,28 +192,25 @@ int main(int argc, char *argv[]) {
 	base[15] = lecture(nom16, 4);
 
 
+	// On présente les exemples :
 	{
 		char nom0[] = "../test3/creations/adroite6.wav";
 		classif(base, l_base, nom0, 2);
     }
-
 	{
 		char nom0[] = "../test3/creations/agauche6.wav";
 		classif(base, l_base, nom0, 2);
     }
-    	
     {
 		char nom0[] = "../test3/creations/enavant6.wav";
 		classif(base, l_base, nom0, 2);
-    }
-    	
+    }   	
     {
 		char nom0[] = "../test3/creations/stop6.wav";
 		classif(base, l_base, nom0, 2);
     }
 
-
-	return -1;
+	return 1;
 }
 
 

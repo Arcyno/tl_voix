@@ -1,0 +1,6 @@
+<devices>
+	<resource classname="VectorResource" resname="Vector">  
+	</resource>
+	<entity classname="VectorBoard" entname="perception-wheel-speed"/>
+	<entity classname="VectorBoard" entname="action-wheel-speed"/>
+</devices>
