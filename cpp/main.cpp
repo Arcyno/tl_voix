@@ -7,6 +7,7 @@
 #include "parameters.h"
 #include "debug.h"
 #include <cmath>
+#include <map>
 
 // faire normalisation et se débrouiller pour avoir une belle classif
 // on a inclu cmath (utile ?)
@@ -119,41 +120,120 @@ double dtw(Morceau &m1, Morceau &m2){
 }
 
 
+int classif(Morceau* base, int l_base, char* nom, int k){
+
+		Morceau m = lecture(nom);
+		std::cout << "nom du fichier : " << nom << std::endl;
+
+		std::map<double, int> hashmap;
+		for (int i = 0; i < l_base; i++){
+			hashmap[dtw(m, base[i])] = base[i].get_classe();
+		}
+
+		int classes[4] = {0};
+		for(auto it = hashmap.cbegin(); it != hashmap.cend(); ++it){
+			classes[it->second-1] += 1;
+			if(classes[it->second-1] == k){
+				std::cout << "classes : " << std::endl;
+				std::cout << "classe1 : " << classes[0] << std::endl;
+				std::cout << "classe2 : " << classes[1] << std::endl;
+				std::cout << "classe3 : " << classes[2] << std::endl;
+				std::cout << "classe4 : " << classes[3] << std::endl;
+				std::cout << "classe choisie : " << it->second << std::endl;
+				return it->second;
+			}
+		}
+
+		// for (int i = 0; i < k; i++){
+		// 	std::cout << "bouckle " << hashmap.end()->first << std::endl;
+		// 	classes[hashmap.end()->second-1] += 1;
+		// 	hashmap.erase(hashmap.end()->first);
+		// }
+
+
+
+
+		// double dist = dtw(m, base[0]);
+		// int cl = base[0].get_classe();
+		// std::cout << "classe : " << cl << ", distance : " << dist << std::endl;
+		// double temp = 0;
+		// for (int i = 1; i < l_base; i++){
+		// 	temp = dtw(m, base[i]);
+		// 	std::cout << "classe : " << base[i].get_classe() << ", distance : " << temp << std::endl;
+		// 	if(temp < dist){
+		// 		dist = temp;
+		// 		cl = base[i].get_classe();
+		// 	}
+		// }
+		std::cout << "----- oups -----" << std::endl;
+		return 0;
+}
+
 
 int main(int argc, char *argv[]) {
 
 	// Creation de la base
-	int l_base = 4;
+	int l_base = 16;
 	Morceau base[l_base];
 
-	char nom1[] = "../test3/adroite2.wav";
+	char nom1[] = "../test3/adroite.wav";
 	base[0] = lecture(nom1, 1);
-	char nom2[] = {"../test3/agauche.wav"};
-	base[1] = lecture(nom2, 2);
-	char nom3[] = "../test3/enavant2.wav";
-	base[2] = lecture(nom3, 3);
+	char nom2[] = "../test3/agauche.wav";
+	base[4] = lecture(nom2, 2);
+	char nom3[] = "../test3/enavant.wav";
+	base[8] = lecture(nom3, 3);
 	char nom4[] = "../test3/stop.wav";
-	base[3] = lecture(nom4, 4);
+	base[12] = lecture(nom4, 4);
+
+	char nom5[] = "../test3/adroite2.wav";
+	base[1] = lecture(nom5, 1);
+	char nom6[] = "../test3/agauche2.wav";
+	base[5] = lecture(nom6, 2);
+	char nom7[] = "../test3/enavant2.wav";
+	base[9] = lecture(nom7, 3);
+	char nom8[] = "../test3/stop2.wav";
+	base[13] = lecture(nom8, 4);
+
+	char nom9[] = "../test3/adroite3.wav";
+	base[2] = lecture(nom9, 1);
+	char nom10[] = "../test3/agauche3.wav";
+	base[6] = lecture(nom10, 2);
+	char nom11[] = "../test3/enavant3.wav";
+	base[10] = lecture(nom11, 3);
+	char nom12[] = "../test3/stop3.wav";
+	base[14] = lecture(nom12, 4);
+
+	char nom13[] = "../test3/creations/adroite5.wav";
+	base[3] = lecture(nom13, 1);
+	char nom14[] = "../test3/creations/agauche5.wav";
+	base[7] = lecture(nom14, 2);
+	char nom15[] = "../test3/creations/enavant5.wav";
+	base[11] = lecture(nom15, 3);
+	char nom16[] = "../test3/creations/stop5.wav";
+	base[15] = lecture(nom16, 4);
 
 
-	char nom0[] = "../test3/agauche2.wav";
-	Morceau m2 = lecture(nom0);
+	{
+		char nom0[] = "../test3/creations/adroite6.wav";
+		classif(base, l_base, nom0, 2);
+    }
 
-	double dist = dtw(m2, base[0]);
-	double cl = base[0].get_classe();
-	std::cout << "classe : " << cl << ", distance : " << dist << std::endl;
-	double temp = 0;
-	for (int i = 1; i < l_base; i++){
-		temp = dtw(m2, base[i]);
-		std::cout << "classe : " << base[i].get_classe() << ", distance : " << temp << std::endl;
-		if(temp < dist){
-			dist = temp;
-			cl = base[i].get_classe();
-		}
-	}
-	std::cout << "nom du fichier : " << nom0 << std::endl;
-	std::cout << "classe choisie : " << cl << std::endl;
-	
+	{
+		char nom0[] = "../test3/creations/agauche6.wav";
+		classif(base, l_base, nom0, 2);
+    }
+    	
+    {
+		char nom0[] = "../test3/creations/enavant6.wav";
+		classif(base, l_base, nom0, 2);
+    }
+    	
+    {
+		char nom0[] = "../test3/creations/stop6.wav";
+		classif(base, l_base, nom0, 2);
+    }
+
+
 	return -1;
 }
 
