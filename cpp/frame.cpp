@@ -93,8 +93,8 @@ void Frame::set_mfcc(int nb_mfcc){
 
 	// Calcul des coefficients
 	int coeff;
-	for(coeff = 0; coeff < nb_mfcc; coeff++){
-		mfcc[coeff] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
+	for(coeff = 1; coeff < nb_mfcc + 1; coeff++){
+		mfcc[coeff-1] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
          // std::cout << "mfcc[coeff]  "<< mfcc[coeff]  << std::endl;
 
 	}
