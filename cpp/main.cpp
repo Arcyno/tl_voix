@@ -133,6 +133,7 @@ int classif(Morceau* base, int l_base, char* nom, int k){
 		int classes[4] = {0};
 		for(auto it = hashmap.cbegin(); it != hashmap.cend(); ++it){
 			classes[it->second-1] += 1;
+			std::cout << "distance : " << it->first << ", classe : " << it->second << std::endl;
 			if(classes[it->second-1] == k){
 				std::cout << "classes : " << std::endl;
 				std::cout << "classe1 : " << classes[0] << std::endl;
@@ -155,7 +156,7 @@ int main(int argc, char *argv[]) {
 	int l_base = 16;
 	Morceau base[l_base];
 
-	char nom1[] = "../test3/adroite.wav";
+/*	char nom1[] = "../test3/adroite.wav";
 	base[0] = lecture(nom1, 1);
 	char nom2[] = "../test3/agauche.wav";
 	base[4] = lecture(nom2, 2);
@@ -180,33 +181,60 @@ int main(int argc, char *argv[]) {
 	char nom11[] = "../test3/enavant3.wav";
 	base[10] = lecture(nom11, 3);
 	char nom12[] = "../test3/stop3.wav";
+	base[14] = lecture(nom12, 4);*/
+
+	char nom1[] = "../test3/creations/adroite7.Nouveau.wav";
+	base[0] = lecture(nom1, 1);
+	char nom2[] = "../test3/creations/agauche7.Nouveau.wav";
+	base[4] = lecture(nom2, 2);
+	char nom3[] = "../test3/creations/enavant7.Nouveau.wav";
+	base[8] = lecture(nom3, 3);
+	char nom4[] = "../test3/creations/stop7.Nouveau.wav";
+	base[12] = lecture(nom4, 4);
+
+	char nom5[] = "../test3/creations/adroite8.Nouveau.wav";
+	base[1] = lecture(nom5, 1);
+	char nom6[] = "../test3/creations/agauche8.Nouveau.wav";
+	base[5] = lecture(nom6, 2);
+	char nom7[] = "../test3/creations/enavant8.Nouveau.wav";
+	base[9] = lecture(nom7, 3);
+	char nom8[] = "../test3/creations/stop8.Nouveau.wav";
+	base[13] = lecture(nom8, 4);
+
+	char nom9[] = "../test3/creations/adroite9.Nouveau.wav";
+	base[2] = lecture(nom9, 1);
+	char nom10[] = "../test3/creations/agauche9.Nouveau.wav";
+	base[6] = lecture(nom10, 2);
+	char nom11[] = "../test3/creations/enavant9.Nouveau.wav";
+	base[10] = lecture(nom11, 3);
+	char nom12[] = "../test3/creations/stop9.Nouveau.wav";
 	base[14] = lecture(nom12, 4);
 
-	char nom13[] = "../test3/creations/adroite5.wav";
+	char nom13[] = "../test3/creations/adroite5.Nouveau.wav";
 	base[3] = lecture(nom13, 1);
-	char nom14[] = "../test3/creations/agauche5.wav";
+	char nom14[] = "../test3/creations/agauche5.Nouveau.wav";
 	base[7] = lecture(nom14, 2);
-	char nom15[] = "../test3/creations/enavant5.wav";
+	char nom15[] = "../test3/creations/enavant5.Nouveau.wav";
 	base[11] = lecture(nom15, 3);
-	char nom16[] = "../test3/creations/stop5.wav";
+	char nom16[] = "../test3/creations/stop5.Nouveau.wav";
 	base[15] = lecture(nom16, 4);
 
 
 	// On présente les exemples :
 	{
-		char nom0[] = "../test3/creations/adroite6.wav";
+		char nom0[] = "../test3/creations/adroite6.Nouveau.wav";
 		classif(base, l_base, nom0, 2);
     }
 	{
-		char nom0[] = "../test3/creations/agauche6.wav";
+		char nom0[] = "../test3/creations/agauche6.Nouveau.wav";
 		classif(base, l_base, nom0, 2);
     }
     {
-		char nom0[] = "../test3/creations/enavant6.wav";
+		char nom0[] = "../test3/creations/enavant6.Nouveau.wav";
 		classif(base, l_base, nom0, 2);
     }   	
     {
-		char nom0[] = "../test3/creations/stop6.wav";
+		char nom0[] = "../test3/creations/stop6.Nouveau.wav";
 		classif(base, l_base, nom0, 2);
     }
 
