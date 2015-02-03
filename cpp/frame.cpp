@@ -71,6 +71,7 @@ void Frame::set_lpc(int ordre_lpc){
 
 
 void Frame::set_mfcc(int nb_mfcc){
+
 	float fft[taille];
 	float data_im[taille];
 	for(int i = 0 ;i < taille ; i++){
@@ -115,8 +116,8 @@ double* Frame::get_signal(){
    dir =  1 gives forward transform
    dir = -1 gives reverse transform 
 */
-int Frame::FFT(int dir,long m,float *x,float *y)
-{
+int Frame::FFT(int dir,long m,float *x,float *y){
+   
    long n,i,i1,j,k,i2,l,l1,l2;
    float c1,c2,tx,ty,t1,t2,u1,u2,z;
 
