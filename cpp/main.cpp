@@ -8,6 +8,9 @@
 #include "debug.h"
 #include <cmath>
 #include <map>
+#include "serie.h"
+#include <string.h>
+#include <unistd.h>
 
 // faire normalisation et se débrouiller pour avoir une belle classif
 // on a inclu cmath (utile ?)
@@ -66,14 +69,15 @@ double distance(Frame &f1, Frame &f2){
 	for(int i = 0; i < NB_MFCC; i++){
 		dist += std::sqrt((mfcc1[i] - mfcc2[i])*(mfcc1[i] - mfcc2[i]));
 		// moy_mfcc += std::sqrt(mfcc2[i]*mfcc2[i]);
+			// std::cout << "mfcc : " << mfcc2[i] << std::endl;
 	}
-	// std::cout << "mfcc : " << moy_mfcc/NB_MFCC << std::endl;
+	// std::cout << "moy mfcc : " << moy_mfcc/NB_MFCC << std::endl;
 
 	//std::cout << "dist : " << dist << std::endl;
 	double * lpc1 = f1.get_lpc();
 	double * lpc2 = f2.get_lpc();
 	for(int i = 0; i < ORDRE_LPC; i++){
-		dist += std::sqrt((lpc1[i] - lpc2[i])*(lpc1[i] - lpc2[i]))*100;
+		dist += std::sqrt((lpc1[i] - lpc2[i])*(lpc1[i] - lpc2[i]));
 		// moy_lpc += std::sqrt(lpc2[i]*lpc2[i]);
 	}
 	// std::cout << "lpc : " << moy_lpc/ORDRE_LPC << std::endl;
@@ -149,8 +153,43 @@ int classif(Morceau* base, int l_base, char* nom, int k){
 		return -1;
 }
 
+void commande(portSerie &port, int classe){
+
+	char consigneSTOP[] = "D,0,0\n";
+	char consigne3[] = "D,10,10\n";
+	char consigne2[] = "D,-20,20\n";
+	char consigne1[] = "D,20,-20\n";
+	switch (classe){
+		case 4:
+			std::cout << "STOP !" << std::endl;
+			ecriturePortSerie(port, consigneSTOP, strlen(consigneSTOP));
+			break;
+		case 3:
+			std::cout << "En avant !" << std::endl;
+			ecriturePortSerie(port, consigne3, strlen(consigne3));
+			break;
+		case 2:
+			std::cout << "A gauche !" << std::endl;
+			ecriturePortSerie(port, consigne2, strlen(consigne2));
+			break;
+		case 1:
+			std::cout << "A droite !" << std::endl;
+			ecriturePortSerie(port, consigne1, strlen(consigne1));
+			break;
+		default:
+			ecriturePortSerie(port, consigneSTOP, strlen(consigneSTOP));
+			break;
+	}
+	sleep(2);
+	ecriturePortSerie(port, consigneSTOP, strlen(consigneSTOP));
+}
+
 
 int main(int argc, char *argv[]) {
+
+	//Ouverture du port serie
+	char nomUSB[] = "/dev/ttyUSB0";
+	portSerie port = ouvrePortSerieBloquant(nomUSB, 38400, 8, 0, 1, 1);
 
 	// Creation de la base
 	int l_base = 16;
@@ -182,6 +221,9 @@ int main(int argc, char *argv[]) {
 	base[10] = lecture(nom11, 3);
 	char nom12[] = "../test3/stop3.wav";
 	base[14] = lecture(nom12, 4);*/
+
+
+
 
 	char nom1[] = "../test3/creations/adroite7.Nouveau.wav";
 	base[0] = lecture(nom1, 1);
@@ -223,20 +265,31 @@ int main(int argc, char *argv[]) {
 	// On présente les exemples :
 	{
 		char nom0[] = "../test3/creations/adroite6.Nouveau.wav";
-		classif(base, l_base, nom0, 2);
+		int classe = classif(base, l_base, nom0, 2);
+		commande(port, classe);
     }
 	{
 		char nom0[] = "../test3/creations/agauche6.Nouveau.wav";
-		classif(base, l_base, nom0, 2);
+		int classe = classif(base, l_base, nom0, 2);
+		commande(port, classe);
     }
     {
 		char nom0[] = "../test3/creations/enavant6.Nouveau.wav";
-		classif(base, l_base, nom0, 2);
+		int classe = classif(base, l_base, nom0, 2);
+		commande(port, classe);
     }   	
     {
 		char nom0[] = "../test3/creations/stop6.Nouveau.wav";
-		classif(base, l_base, nom0, 2);
+		int classe = classif(base, l_base, nom0, 2);
+		commande(port, classe);
     }
+
+    // par defaut, arret du robot
+	char consigneSTOP[] = "D,0,0\n";
+	ecriturePortSerie(port, consigneSTOP, strlen(consigneSTOP));
+
+	// fermeture du port serie
+	fermePortSerie(port);
 
 	return 1;
 }

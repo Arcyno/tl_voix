@@ -1,3 +1,3 @@
 #define TAILLE_FRAME 256
-#define NB_MFCC 40
-#define ORDRE_LPC 10
+#define NB_MFCC 20
+#define ORDRE_LPC 7

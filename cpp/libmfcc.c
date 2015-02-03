@@ -85,7 +85,11 @@ double log_adapte(double var){
  			innerSum[13] += fabs(spectralData[k+13] * GetFilterParameter(samplingRate, binSize, k, l));
  			innerSum[14] += fabs(spectralData[k+14] * GetFilterParameter(samplingRate, binSize, k, l));
  			innerSum[15] += fabs(spectralData[k+15] * GetFilterParameter(samplingRate, binSize, k, l));
+ 				   // std::cout << "GetFilterParameter" << GetFilterParameter(samplingRate, binSize, k, l) << std::endl;
+
  		}
+
+		double sumTot = innerSum[0]+innerSum[1]+innerSum[2]+innerSum[3]+innerSum[4]+innerSum[5]+innerSum[6]+innerSum[7]+innerSum[8]+innerSum[9]+innerSum[10]+innerSum[11]+innerSum[12]+innerSum[13]+innerSum[14]+innerSum[15];
 
  	// 	if(innerSum > 0.0f)
  	// 	{
@@ -96,28 +100,31 @@ double log_adapte(double var){
 		// innerSum = innerSum * cos(((m * PI) / NumFilters) * (l - 0.5f));
 
 
-		innerSum[0] = log_adapte(innerSum[0]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[1] = log_adapte(innerSum[1]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[2] = log_adapte(innerSum[2]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[3] = log_adapte(innerSum[3]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[4] = log_adapte(innerSum[4]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[5] = log_adapte(innerSum[5]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[6] = log_adapte(innerSum[6]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[7] = log_adapte(innerSum[7]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[8]  = log_adapte(innerSum[8]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[9]  = log_adapte(innerSum[9]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[10] = log_adapte(innerSum[10]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[11] = log_adapte(innerSum[11]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[12] = log_adapte(innerSum[12]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[13] = log_adapte(innerSum[13]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[14] = log_adapte(innerSum[14]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
-		innerSum[15] = log_adapte(innerSum[15]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		sumTot = log_adapte(sumTot) * cos(((m * PI) / NumFilters) * (l - 0.5f));
 
-		outerSum += innerSum[0]+innerSum[1]+innerSum[2]+innerSum[3]+innerSum[4]+innerSum[5]+innerSum[6]+innerSum[7]+innerSum[8]+innerSum[9]+innerSum[10]+innerSum[11]+innerSum[12]+innerSum[13]+innerSum[14]+innerSum[15];
+		// innerSum[0] = log_adapte(innerSum[0]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[1] = log_adapte(innerSum[1]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[2] = log_adapte(innerSum[2]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[3] = log_adapte(innerSum[3]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[4] = log_adapte(innerSum[4]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[5] = log_adapte(innerSum[5]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[6] = log_adapte(innerSum[6]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[7] = log_adapte(innerSum[7]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[8]  = log_adapte(innerSum[8]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[9]  = log_adapte(innerSum[9]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[10] = log_adapte(innerSum[10]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[11] = log_adapte(innerSum[11]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[12] = log_adapte(innerSum[12]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[13] = log_adapte(innerSum[13]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[14] = log_adapte(innerSum[14]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		// innerSum[15] = log_adapte(innerSum[15]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+
+		// outerSum += innerSum[0]+innerSum[1]+innerSum[2]+innerSum[3]+innerSum[4]+innerSum[5]+innerSum[6]+innerSum[7]+innerSum[8]+innerSum[9]+innerSum[10]+innerSum[11]+innerSum[12]+innerSum[13]+innerSum[14]+innerSum[15];
+		outerSum += sumTot;
 	}
 
 	result *= outerSum;
-	   // std::cout << "NumFilters" << binSize << std::endl;
+	   // std::cout << "result " << outerSum << std::endl;
 
    // std::cout << "time1 = " << (t22-t2) << std::endl;
    // std::cout << "time3 = " << (t4-t3) << std::endl;

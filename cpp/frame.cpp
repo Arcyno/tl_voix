@@ -71,17 +71,12 @@ void Frame::set_lpc(int ordre_lpc){
 
 
 void Frame::set_mfcc(int nb_mfcc){
-
-   clock_t t;
-   time_t t0 = clock();
-
 	float fft[taille];
 	float data_im[taille];
 	for(int i = 0 ;i < taille ; i++){
 		fft[i] = signal[i];
 		data_im[i] = 0;
 	}
-   time_t t1 = clock();
 
 	FFT(-1, 8, fft, data_im);
 	double fft2[taille];
@@ -90,23 +85,12 @@ void Frame::set_mfcc(int nb_mfcc){
 		fft[i] = sqrt(fft[i]*fft[i] + data_im[i]*data_im[i]);
 		fft2[i] = static_cast<double>(fft[0]);
 	}
-   time_t t2 = clock();
 
 	// Compute the first 40 coefficients
 	int coeff;
 	for(coeff = 0; coeff < nb_mfcc; coeff++){
-      time_t t4 = clock();
 		mfcc[coeff] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
-      if(mfcc[coeff]>1000){
-         std::cout << "mfcc[coeff] = " << mfcc[coeff] << ", indice = " << coeff << std::endl;
-      }
-      time_t t5 = clock();
-      //std::cout << "time_unique_coeffs = " << (t5-t4) << std::endl;
 	}
-   time_t t3 = clock();
-
-   //std::cout << "time_fft = " << (t2-t1) << std::endl;
-   //std::cout << "time_coeffs = " << (t3-t2) << std::endl;
 }
 
 
