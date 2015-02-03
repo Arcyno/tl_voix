@@ -88,13 +88,15 @@ void Frame::set_mfcc(int nb_mfcc){
 	for(int i=0; i < taille; i++){
         // On ne conserve que le module
 		fft[i] = sqrt(fft[i]*fft[i] + data_im[i]*data_im[i]);
-		fft2[i] = static_cast<double>(fft[0]);
+		fft2[i] = static_cast<double>(fft[i]);
 	}
 
 	// Calcul des coefficients
 	int coeff;
 	for(coeff = 0; coeff < nb_mfcc; coeff++){
 		mfcc[coeff] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
+         // std::cout << "mfcc[coeff]  "<< mfcc[coeff]  << std::endl;
+
 	}
 }
 
