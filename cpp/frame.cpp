@@ -9,16 +9,18 @@
 #define pi 3.14159265358979323846264338327
 
 
+// Constructeur par defaut
 Frame::Frame(){
 	taille = 0;
 }
 
 
+// Constructeur
 Frame::Frame(double* signal_donne, int taille_donne, int f_ech_donne, int ordre_lpc, int nb_mfcc){
 
-   // double signal2[taille_donne];
+    // On se permet la recopie puisqu'au moment d'appeler ce constructeur,
+    // le tableau signal_donne est un tampon qui est ensuite ecrase
    std::copy(signal_donne, signal_donne + taille_donne, signal);
-   // signal = signal2;
 
 	taille = taille_donne;
 	f_ech = f_ech_donne;
@@ -38,15 +40,15 @@ void Frame::set_lpc(int ordre_lpc){
 	double lpc_up[ordre_lpc]; 
 	double autocorr[taille - ordre_lpc];
 
-	// Autocorrélation jusqu'à l'ordre des lpc
+	// Calcul de l'autocorrélation jusqu'a l'ordre des lpc
 	for(int i = 0; i < ordre_lpc; i++){
 		autocorr[i] = 0;
 		for(int j = 0; j <= taille-1-i ; j++){
-         //std::cout << "i " << i << " et j " << j << std::endl;
 			autocorr[i] += signal[j] * signal[j + i] / taille;
 		}
 	}
 
+    // Algorithme de Levinson-Durbin
 	double tmp = -autocorr[1]/autocorr[0];
 	lpc[0]=(tmp);
 	double sigma2 = (1 - tmp*tmp)*autocorr[0];
@@ -72,22 +74,24 @@ void Frame::set_lpc(int ordre_lpc){
 
 void Frame::set_mfcc(int nb_mfcc){
 
+    // initialisation de la FFT (qui est calculee sur place)
 	float fft[taille];
 	float data_im[taille];
 	for(int i = 0 ;i < taille ; i++){
 		fft[i] = signal[i];
 		data_im[i] = 0;
 	}
-
+    // Calcul de la FFT
 	FFT(-1, 8, fft, data_im);
+    // Formatage du resultat obtenu qui separait la partie reelle et la partie imaginaire
 	double fft2[taille];
 	for(int i=0; i < taille; i++){
-		// Normalisation
+        // On ne conserve que le module
 		fft[i] = sqrt(fft[i]*fft[i] + data_im[i]*data_im[i]);
 		fft2[i] = static_cast<double>(fft[0]);
 	}
 
-	// Compute the first 40 coefficients
+	// Calcul des coefficients
 	int coeff;
 	for(coeff = 0; coeff < nb_mfcc; coeff++){
 		mfcc[coeff] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);

@@ -21,9 +21,9 @@ private:
 
 public:
 
-	Frame(); //constructeur par défaut
+	Frame(); // Constructeur par défaut
 
-	Frame(double* signal_donne, int taille_donne, int f_ech, int ordre_lpc, int nb_mfcc);
+	Frame(double* signal_donne, int taille_donne, int f_ech, int ordre_lpc, int nb_mfcc); // Constructeur
 
 	double* get_lpc();
 

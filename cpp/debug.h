@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+// Cette surcharge de l'operateur << pour les vecteurs
+// nous permet d'afficher les premiers elements d'un vecteur
+// (utile pour  debugger)
 
 std::ostream& operator<<( std::ostream &out, const double* tab){
 	out << std::endl << "10 premiers éléments du tableau : " << std::endl;

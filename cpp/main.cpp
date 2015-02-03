@@ -12,14 +12,16 @@
 #include <string.h>
 #include <unistd.h>
 
-// faire normalisation et se débrouiller pour avoir une belle classif
-// on a inclu cmath (utile ?)
 
 Morceau lecture(char* fileName, int classe_donne = 0){
+    /*
+    Cette fonction prend en argument le nom d'un fichier .wav
+    et sa classe si elle est connue
+    Elle renvoie l'objet de type Morceau correspondant
+    */
 
 	SF_INFO sfinfo;
 	SNDFILE* infile;
-	//infile = sf_open(fileName, SFM_READ, & sfinfo );	
 	if ( !(infile = sf_open(fileName, SFM_READ, &sfinfo)) ){   
 		// Open failed so print an error message.
 	    printf ("Not able to open input file %s.\n", fileName) ;
@@ -28,19 +30,25 @@ Morceau lecture(char* fileName, int classe_donne = 0){
 	} 	
 	
 	int f_ech = sfinfo.samplerate;
+    
+    // Chargement de constantes depuis parameters.h
 	int ordre_lpc = ORDRE_LPC;
 	int nb_mfcc = NB_MFCC;	
 	int frames_length = TAILLE_FRAME;
 
-
+    // Initialisations
 	double data[frames_length/2];
 	auto size_data = frames_length/2;
 	std::list<Frame> frames;
 	int n_frames = 0;
 	double concat[frames_length];
+    
 	sf_read_double (infile, data, frames_length/2);
 	std::copy(data, data + size_data, concat);
-
+    // la variable concat contient les Frames qui sont ajoutees à la liste frames
+    // elle est obtenue par concatenation de la deuxième moitié de la frame precedente
+    // et du fruit de la lecture de la demi-frame suivante (data)
+    // On a ainsi des trames qui se chevauchent
 	while(frames_length/2 == sf_read_double (infile, data, frames_length/2)){
 		n_frames++;
 		std::copy(data, data + size_data, concat + size_data);
@@ -51,7 +59,8 @@ Morceau lecture(char* fileName, int classe_donne = 0){
 	}
 
 	sf_close(infile);
-
+    
+    // On utilise le constructeur pour obtenir l'objet a renvoyer
 	Morceau morceau = Morceau(frames, n_frames, classe_donne);
 	
 	return morceau;
@@ -60,27 +69,22 @@ Morceau lecture(char* fileName, int classe_donne = 0){
 
 
 double distance(Frame &f1, Frame &f2){
-
+    /*
+    Cette fonction renvoie la distance locale entre deux Frames passees en argument
+    Il s'agit de la distance euclidienne entre les vecteurs de caracteristiques :
+    caracteristiques = [LPC MFCC]
+    */
 	double dist = 0;
 	double * mfcc1 = f1.get_mfcc();
 	double * mfcc2 = f2.get_mfcc();
-	double moy_mfcc=0;
-	double moy_lpc = 0;
 	for(int i = 0; i < NB_MFCC; i++){
 		dist += std::sqrt((mfcc1[i] - mfcc2[i])*(mfcc1[i] - mfcc2[i]));
-		// moy_mfcc += std::sqrt(mfcc2[i]*mfcc2[i]);
-			// std::cout << "mfcc : " << mfcc2[i] << std::endl;
 	}
-	// std::cout << "moy mfcc : " << moy_mfcc/NB_MFCC << std::endl;
-
-	//std::cout << "dist : " << dist << std::endl;
 	double * lpc1 = f1.get_lpc();
 	double * lpc2 = f2.get_lpc();
 	for(int i = 0; i < ORDRE_LPC; i++){
 		dist += std::sqrt((lpc1[i] - lpc2[i])*(lpc1[i] - lpc2[i]));
-		// moy_lpc += std::sqrt(lpc2[i]*lpc2[i]);
 	}
-	// std::cout << "lpc : " << moy_lpc/ORDRE_LPC << std::endl;
 
 	return dist;
 }
@@ -88,19 +92,22 @@ double distance(Frame &f1, Frame &f2){
 
 
 double dtw(Morceau &m1, Morceau &m2){
-
-	int i = 0;
-	int j = 0;
+    /*
+    Cette fonction renvoie la distance globale entre deux morceaux passes en argument
+    en utilisant l'algorithme DTW
+    */
+    // Le tableau distances contient les distances cumulees minimales en partant de la case (0,0)
 	double distances[m1.get_n_frames()][m2.get_n_frames()];
 	Frame* frames1 = m1.get_frames();
 	Frame* frames2 = m2.get_frames();
-
+	int i = 0;
+	int j = 0;
+    // On commence par renseigner la premiere ligne
 	distances[0][0] = distance(frames1[0], frames2[0]);
 	for(j = 1; j < m2.get_n_frames(); j++){
 		distances[0][j] = distances[0][j-1] + distance(frames1[0], frames2[j]);
-			// distances[0][j] = 0;
-
 	}
+    //On renseigne les autres lignes
 	for(i = 1; i < m1.get_n_frames(); i++){
 		distances[i][0] = distances[i-1][0] + distance(frames1[i], frames2[0]);
 		for(j = 1; j < m2.get_n_frames(); j++){
@@ -108,53 +115,63 @@ double dtw(Morceau &m1, Morceau &m2){
 			distances[i][j] = std::min(distances[i-1][j-1],std::min(distances[i-1][j],distances[i][j-1])) + distance(frames1[i], frames2[j]);
 		}
 	}
-
-	//plotMatrix
-	//  std::cout<< std::endl<< std::endl<< std::endl<< " nouvelle matrice : " << m1.get_classe() << " avec " << m2.get_classe() << std::endl;  // when the inner loop is done, go to a new line
-	// int n = m2.get_n_frames()/4;
-	// int m = m1.get_n_frames()/4;
-	// for(int x=0;x<m;x++){
-	// 	std::cout<< " | ";
-	// 	for(int y=0;y<n;y++){
- //            std::cout<< static_cast<int>(distances[x][y]) << " ";  // display the current element out of the array
- //        }
- //    	std::cout<< " | " << std::endl;  // when the inner loop is done, go to a new line
- //    }
+    // La valeur renvoyee est normalisee par la somme des longueurs des morceaux 
+    // pour ne pas penaliser les morceaux de grande taille
+    // (ou pour ne pas avantager les morceaux de petite taille)
 	return distances[i-1][j-1]/(m1.get_n_frames()+m2.get_n_frames());
 }
 
 
+
 int classif(Morceau* base, int l_base, char* nom, int k){
+    /*
+    Cette fonction prend en argument une base de morceaux de classe connue
+    et l'emplacement d'un morceau de classe inconnue
+    k : parametre de l'algorithme de classification
+    */
+    // lecture du morceau de classe inconnue
+	Morceau m = lecture(nom);
+	std::cout << "nom du fichier : " << nom << std::endl;
 
-		Morceau m = lecture(nom);
-		std::cout << "nom du fichier : " << nom << std::endl;
-
-		std::map<double, int> hashmap;
-		for (int i = 0; i < l_base; i++){
-			hashmap[dtw(m, base[i])] = base[i].get_classe();
+    // On construit une hashmap qui aura pour clefs les distances globales entre 
+    // les morceaux de la base et le morceau de classe inconnue
+    // et pour valeurs la classe du morceau de la base.
+	std::map<double, int> hashmap;
+	for (int i = 0; i < l_base; i++){
+		hashmap[dtw(m, base[i])] = base[i].get_classe();
+	}
+    
+    // Comme une hashmap est triee par ordre croissant, 
+    // il suffit de la parcourir dans l'ordre pour obtenir les plus petites distances
+	int classes[4] = {0};
+	for(auto it = hashmap.cbegin(); it != hashmap.cend(); ++it){
+        // dans l'ordre de proximite des morceaux, on enregistre les classes obtenues
+        // jusqu'à ce qu'on obtienne k fois la meme classe
+        // C'est alors cette classe qui est choisie
+		classes[it->second-1] += 1;
+		// std::cout << "distance : " << it->first << ", classe : " << it->second << std::endl;
+		if(classes[it->second-1] == k){
+			// std::cout << "classe1 : " << classes[0] << std::endl;
+			// std::cout << "classe2 : " << classes[1] << std::endl;
+			// std::cout << "classe3 : " << classes[2] << std::endl;
+			// std::cout << "classe4 : " << classes[3] << std::endl;
+			std::cout << "classe choisie : " << it->second << std::endl;
+			return it->second;
 		}
-
-		int classes[4] = {0};
-		for(auto it = hashmap.cbegin(); it != hashmap.cend(); ++it){
-			classes[it->second-1] += 1;
-			std::cout << "distance : " << it->first << ", classe : " << it->second << std::endl;
-			if(classes[it->second-1] == k){
-				std::cout << "classes : " << std::endl;
-				std::cout << "classe1 : " << classes[0] << std::endl;
-				std::cout << "classe2 : " << classes[1] << std::endl;
-				std::cout << "classe3 : " << classes[2] << std::endl;
-				std::cout << "classe4 : " << classes[3] << std::endl;
-				std::cout << "classe choisie : " << it->second << std::endl;
-				return it->second;
-			}
-		}
-
-		std::cout << "----- oups -----" << std::endl;
-		return -1;
+	}
+    
+    // L'algorithme est mal dimensionne si on n'atteint jamais k fois la meme classe
+    // Dans ce cas, adapter la valeur de k
+	std::cout << "----- oups -----" << std::endl;
+	return -1;
 }
 
 void commande(portSerie &port, int classe){
-
+    /*
+    Cette fonction prend en argument un port serie prealablement ouvert
+    et lui transmet une consigne de deplacement
+    correspondant a l'ordre passeen argument : classe
+    */
 	char consigneSTOP[] = "D,0,0\n";
 	char consigne3[] = "D,10,10\n";
 	char consigne2[] = "D,-20,20\n";
@@ -181,8 +198,10 @@ void commande(portSerie &port, int classe){
 			break;
 	}
 	sleep(2);
+    // On termine en arretant le robot, pour des raisons de securite
 	ecriturePortSerie(port, consigneSTOP, strlen(consigneSTOP));
 }
+
 
 
 int main(int argc, char *argv[]) {
@@ -195,6 +214,7 @@ int main(int argc, char *argv[]) {
 	int l_base = 16;
 	Morceau base[l_base];
 
+    //base d'origine
 /*	char nom1[] = "../test3/adroite.wav";
 	base[0] = lecture(nom1, 1);
 	char nom2[] = "../test3/agauche.wav";
@@ -224,7 +244,7 @@ int main(int argc, char *argv[]) {
 
 
 
-
+    // Base creee par nos soins (un seul locuteur)
 	char nom1[] = "../test3/creations/adroite7.Nouveau.wav";
 	base[0] = lecture(nom1, 1);
 	char nom2[] = "../test3/creations/agauche7.Nouveau.wav";
@@ -262,7 +282,7 @@ int main(int argc, char *argv[]) {
 	base[15] = lecture(nom16, 4);
 
 
-	// On présente les exemples :
+	// On presente des exemples :
 	{
 		char nom0[] = "../test3/creations/adroite6.Nouveau.wav";
 		int classe = classif(base, l_base, nom0, 2);
@@ -284,7 +304,7 @@ int main(int argc, char *argv[]) {
 		commande(port, classe);
     }
 
-    // par defaut, arret du robot
+    // par defaut, arret du robot quand on n'a plus d'instructions
 	char consigneSTOP[] = "D,0,0\n";
 	ecriturePortSerie(port, consigneSTOP, strlen(consigneSTOP));
 
@@ -294,15 +314,3 @@ int main(int argc, char *argv[]) {
 	return 1;
 }
 
-
-// sans norme :
-// adroite2,3 x,x
-// agauche2 x,v
-// enavant2,3 v,x
-// stop2,3 v,v
-
-// avec norme :
-// adroite2,3 x,x
-// agauche2 x,v
-// enavant2,3 x,x
-// stop2,3 v,v
