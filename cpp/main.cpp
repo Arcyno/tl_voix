@@ -83,7 +83,7 @@ double distance(Frame &f1, Frame &f2){
 	double * lpc1 = f1.get_lpc();
 	double * lpc2 = f2.get_lpc();
 	for(int i = 0; i < ORDRE_LPC; i++){
-		dist += std::sqrt((lpc1[i] - lpc2[i])*(lpc1[i] - lpc2[i]));
+		dist += std::sqrt((lpc1[i] - lpc2[i])*(lpc1[i] - lpc2[i]))*2;
 	}
 
 	return dist;
