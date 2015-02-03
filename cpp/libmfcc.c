@@ -35,7 +35,7 @@ double log_adapte(double var){
  {
  	double result = 0.0f;
  	double outerSum = 0.0f;
- 	double innerSum[8] = {0.0f};
+ 	double innerSum[16] = {0.0f};
  	unsigned int k, l;
 
 	// 0 <= m < L
@@ -70,21 +70,21 @@ double log_adapte(double var){
  		for(k = 0; k < binSize - 1; k+=16)
  		{
  			innerSum[0] += fabs(spectralData[k] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[1] += fabs(spectralData[k+1] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[2] += fabs(spectralData[k+2] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[3] += fabs(spectralData[k+3] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[4] += fabs(spectralData[k+4] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[5] += fabs(spectralData[k+5] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[6] += fabs(spectralData[k+6] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[7] += fabs(spectralData[k+7] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[8]  += fabs(spectralData[k+8] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[9]  += fabs(spectralData[k+9] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[10] += fabs(spectralData[k+10] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[11] += fabs(spectralData[k+11] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[12] += fabs(spectralData[k+12] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[13] += fabs(spectralData[k+13] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[14] += fabs(spectralData[k+14] * GetFilterParameter(samplingRate, binSize, k, l));
- 			innerSum[15] += fabs(spectralData[k+15] * GetFilterParameter(samplingRate, binSize, k, l));
+ 			innerSum[1] += fabs(spectralData[k+1] * GetFilterParameter(samplingRate, binSize, k+1, l));
+ 			innerSum[2] += fabs(spectralData[k+2] * GetFilterParameter(samplingRate, binSize, k+2, l));
+ 			innerSum[3] += fabs(spectralData[k+3] * GetFilterParameter(samplingRate, binSize, k+3, l));
+ 			innerSum[4] += fabs(spectralData[k+4] * GetFilterParameter(samplingRate, binSize, k+4, l));
+ 			innerSum[5] += fabs(spectralData[k+5] * GetFilterParameter(samplingRate, binSize, k+5, l));
+ 			innerSum[6] += fabs(spectralData[k+6] * GetFilterParameter(samplingRate, binSize, k+6, l));
+ 			innerSum[7] += fabs(spectralData[k+7] * GetFilterParameter(samplingRate, binSize, k+7, l));
+ 			innerSum[8]  += fabs(spectralData[k+8] * GetFilterParameter(samplingRate, binSize, k+8, l));
+ 			innerSum[9]  += fabs(spectralData[k+9] * GetFilterParameter(samplingRate, binSize, k+9, l));
+ 			innerSum[10] += fabs(spectralData[k+10] * GetFilterParameter(samplingRate, binSize, k+10, l));
+ 			innerSum[11] += fabs(spectralData[k+11] * GetFilterParameter(samplingRate, binSize, k+11, l));
+ 			innerSum[12] += fabs(spectralData[k+12] * GetFilterParameter(samplingRate, binSize, k+12, l));
+ 			innerSum[13] += fabs(spectralData[k+13] * GetFilterParameter(samplingRate, binSize, k+13, l));
+ 			innerSum[14] += fabs(spectralData[k+14] * GetFilterParameter(samplingRate, binSize, k+14, l));
+ 			innerSum[15] += fabs(spectralData[k+15] * GetFilterParameter(samplingRate, binSize, k+15, l));
  				   // std::cout << "GetFilterParameter" << GetFilterParameter(samplingRate, binSize, k, l) << std::endl;
 
  		}
