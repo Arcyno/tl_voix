@@ -100,7 +100,7 @@ double log_adapte(double var){
 		// innerSum = innerSum * cos(((m * PI) / NumFilters) * (l - 0.5f));
 
 
-		sumTot = log_adapte(sumTot) * cos(((m * PI) / NumFilters) * (l - 0.5f));
+		sumTot = log_adapte(sumTot)*log_adapte(sumTot) * cos(((m * PI) / NumFilters) * (l - 0.5f));
 
 		// innerSum[0] = log_adapte(innerSum[0]) * cos(((m * PI) / NumFilters) * (l - 0.5f));
 		// innerSum[1] = log_adapte(innerSum[1]) * cos(((m * PI) / NumFilters) * (l - 0.5f));

@@ -104,7 +104,7 @@ void Frame::set_mfcc(int nb_mfcc){
    mfcc[0] = GetCoefficient(fft2, 16000, nb_mfcc, taille, 1);
 
    for(coeff = 2; coeff < nb_mfcc/2 + 2; coeff++){
-      mfcc[coeff-1] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff);
+      mfcc[coeff-1] = GetCoefficient(fft2, 16000, nb_mfcc, taille, coeff)*pow(0.95,coeff);
          // std::cout << "mfcc[coeff]  "<< coeff+nb_mfcc/2-1 << std::endl;
       mfcc[coeff+nb_mfcc/2-1] = mfcc[coeff-1]-mfcc[coeff-2];
    }

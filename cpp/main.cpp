@@ -30,7 +30,7 @@ Morceau lecture(const char* fileName, int classe_donne = 0){
 		// Open failed so print an error message.
     	printf ("Not able to open input file %s.\n", fileName) ;
     	sf_perror (NULL);
-    	return Morceau();
+    	// return Morceau();
     } 	
 
     int f_ech = sfinfo.samplerate;
@@ -65,7 +65,7 @@ Morceau lecture(const char* fileName, int classe_donne = 0){
     sf_close(infile);
     
     // On utilise le constructeur pour obtenir l'objet a renvoyer
-    Morceau morceau = Morceau(frames, n_frames, classe_donne);
+    Morceau morceau = Morceau(frames, n_frames,fileName, classe_donne);
 
     return morceau;
 };
@@ -87,7 +87,7 @@ double distance(Frame &f1, Frame &f2){
     double * lpc1 = f1.get_lpc();
     double * lpc2 = f2.get_lpc();
     for(int i = 0; i < ORDRE_LPC; i++){
-    	dist += std::sqrt((lpc1[i] - lpc2[i])*(lpc1[i] - lpc2[i]))*10;
+    	dist += std::sqrt((lpc1[i] - lpc2[i])*(lpc1[i] - lpc2[i]))*0;
     }
 
     return dist;
@@ -135,7 +135,7 @@ int classif(Morceau* base, int l_base, char* nom, int k){
     */
     // lecture du morceau de classe inconnue
     Morceau m = lecture(nom);
-    std::cout << "nom du fichier : " << nom << std::endl;
+    // std::cout << "nom du fichier : " << nom << std::endl;
 
     // On construit une hashmap qui aura pour clefs les distances globales entre 
     // les morceaux de la base et le morceau de classe inconnue
@@ -153,12 +153,12 @@ int classif(Morceau* base, int l_base, char* nom, int k){
         // jusqu'à ce qu'on obtienne k fois la meme classe
         // C'est alors cette classe qui est choisie
     	classes[it->second-1] += 1;
-		// std::cout << "distance : " << it->first << ", classe : " << it->second << std::endl;
+		std::cout << "distance : " << it->first << ", classe : " << it->second << std::endl;
     	if(classes[it->second-1] == k){
-    		std::cout << "classe1 : " << classes[0] << std::endl;
-    		std::cout << "classe2 : " << classes[1] << std::endl;
-    		std::cout << "classe3 : " << classes[2] << std::endl;
-    		std::cout << "classe4 : " << classes[3] << std::endl;
+    		// std::cout << "classe1 : " << classes[0] << std::endl;
+    		// std::cout << "classe2 : " << classes[1] << std::endl;
+    		// std::cout << "classe3 : " << classes[2] << std::endl;
+    		// std::cout << "classe4 : " << classes[3] << std::endl;
     		std::cout << "classe choisie : " << it->second << std::endl;
     		return it->second;
     	}
@@ -241,13 +241,15 @@ int main(int argc, char *argv[]) {
 	while(true){
 		std::cin >> nom0;
 		std::cout << "analyse de " << nom0 << "..." << std::endl;
-        // char play[] = "play ";
-        // char command[100];
-        // strcat(command, play);
-        // strcat(command, nom0);
-        // // std::cout << "b " << command << std::endl;
-        // auto b = system(command);
-		commande(port, classif(base, l_base, nom0, 1));
+        char play[] = "play ";
+        char command[100]="";
+        strcat(command, play);
+        strcat(command, nom0);
+
+        // std::cout << command << std::endl;
+        auto b = system(command);
+        std::cout << "============================================================================================ " << std::endl;
+		commande(port, classif(base, l_base, nom0, 3));
 	}
 
 
