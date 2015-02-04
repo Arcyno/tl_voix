@@ -8,7 +8,7 @@
 
 std::ostream& operator<<( std::ostream &out, const double* tab){
 	out << std::endl << "10 premiers éléments du tableau : " << std::endl;
-	for(int i=0; i<10; ++i){
+	for(int i=0; i<NB_MFCC; ++i){
 		out << tab[i] << std::endl;
 	}
 	return out ;

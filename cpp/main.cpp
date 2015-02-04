@@ -11,9 +11,13 @@
 #include "serie.h"
 #include <string.h>
 #include <unistd.h>
+#include <sstream>
 
 
-Morceau lecture(char* fileName, int classe_donne = 0){
+// regarder avec ancienne base
+// delta
+
+Morceau lecture(const char* fileName, int classe_donne = 0){
     /*
     Cette fonction prend en argument le nom d'un fichier .wav
     et sa classe si elle est connue
@@ -151,10 +155,10 @@ int classif(Morceau* base, int l_base, char* nom, int k){
     	classes[it->second-1] += 1;
 		// std::cout << "distance : " << it->first << ", classe : " << it->second << std::endl;
     	if(classes[it->second-1] == k){
-    		// std::cout << "classe1 : " << classes[0] << std::endl;
-    		// std::cout << "classe2 : " << classes[1] << std::endl;
-    		// std::cout << "classe3 : " << classes[2] << std::endl;
-    		// std::cout << "classe4 : " << classes[3] << std::endl;
+    		std::cout << "classe1 : " << classes[0] << std::endl;
+    		std::cout << "classe2 : " << classes[1] << std::endl;
+    		std::cout << "classe3 : " << classes[2] << std::endl;
+    		std::cout << "classe4 : " << classes[3] << std::endl;
     		std::cout << "classe choisie : " << it->second << std::endl;
     		return it->second;
     	}
@@ -211,131 +215,44 @@ int main(int argc, char *argv[]) {
 	portSerie port = ouvrePortSerieBloquant(nomUSB, 38400, 8, 0, 1, 1);
 
 	// Creation de la base
-	int l_base = 36;
+	int l_base = NB_FICHIERS;
 	Morceau base[l_base];
 
-    //base d'origine
-/*	char nom1[] = "../test3/adroite.wav";
-	base[0] = lecture(nom0, 1);
-	char nom2[] = "../test3/agauche.wav";
-	base[4] = lecture(nom2, 2);
-	char nom3[] = "../test3/enavant.wav";
-	base[8] = lecture(nom3, 3);
-	char nom4[] = "../test3/stop.wav";
-	base[12] = lecture(nom4, 4);
+    int i = 0;
+    std::istringstream f(FICHIERS);
+    std::string line;   
+    char nom[50];
 
-	char nom5[] = "../test3/adroite2.wav";
-	base[1] = lecture(nom5, 1);
-	char nom6[] = "../test3/agauche2.wav";
-	base[5] = lecture(nom6, 2);
-	char nom7[] = "../test3/enavant2.wav";
-	base[9] = lecture(nom7, 3);
-	char nom8[] = "../test3/stop2.wav";
-	base[13] = lecture(nom8, 4);
-
-	char nom9[] = "../test3/adroite3.wav";
-	base[2] = lecture(nom9, 1);
-	char nom10[] = "../test3/agauche3.wav";
-	base[6] = lecture(nom10, 2);
-	char nom11[] = "../test3/enavant3.wav";
-	base[10] = lecture(nom11, 3);
-	char nom12[] = "../test3/stop3.wav";
-	base[14] = lecture(nom12, 4);*/
-
-
-
-    // Base creee par nos soins (un seul locuteur)
-	char nom1[] = "../test3/creations/adroite7.wav";
-	base[0] = lecture(nom1, 1);
-	char nom2[] = "../test3/creations/agauche7.wav";
-	base[4] = lecture(nom2, 2);
-	char nom3[] = "../test3/creations/enavant7.wav";
-	base[8] = lecture(nom3, 3);
-	char nom4[] = "../test3/creations/stop7.wav";
-	base[12] = lecture(nom4, 4);
-
-	char nom5[] = "../test3/creations/adroite8.wav";
-	base[1] = lecture(nom5, 1);
-	char nom6[] = "../test3/creations/agauche8.wav";
-	base[5] = lecture(nom6, 2);
-	char nom7[] = "../test3/creations/enavant8.wav";
-	base[9] = lecture(nom7, 3);
-	char nom8[] = "../test3/creations/stop8.wav";
-	base[13] = lecture(nom8, 4);
-
-	char nom9[] = "../test3/creations/adroite9.wav";
-	base[2] = lecture(nom9, 1);
-	char nom10[] = "../test3/creations/agauche9.wav";
-	base[6] = lecture(nom10, 2);
-	char nom11[] = "../test3/creations/enavant9.wav";
-	base[10] = lecture(nom11, 3);
-	char nom12[] = "../test3/creations/stop9.wav";
-	base[14] = lecture(nom12, 4);
-
-	char nom13[] = "../test3/creations/adroite5.wav";
-	base[3] = lecture(nom13, 1);
-	char nom14[] = "../test3/creations/agauche5.wav";
-	base[7] = lecture(nom14, 2);
-	char nom15[] = "../test3/creations/enavant5.wav";
-	base[11] = lecture(nom15, 3);
-	char nom16[] = "../test3/creations/stop5.wav";
-	base[15] = lecture(nom16, 4);
-
-	char nom17[] = "../test3/creations/adroite10.wav";
-	base[16] = lecture(nom13, 1);
-	char nom18[] = "../test3/creations/agauche10.wav";
-	base[17] = lecture(nom14, 2);
-	char nom19[] = "../test3/creations/enavant10.wav";
-	base[18] = lecture(nom15, 3);
-	char nom20[] = "../test3/creations/stop10.wav";
-	base[19] = lecture(nom16, 4);
-
-	char nom21[] = "../test3/creations/adroite11.wav";
-	base[20] = lecture(nom21, 1);
-	char nom22[] = "../test3/creations/agauche11.wav";
-	base[21] = lecture(nom22, 2);
-	char nom23[] = "../test3/creations/enavant11.wav";
-	base[22] = lecture(nom23, 3);
-	char nom24[] = "../test3/creations/stop11.wav";
-	base[23] = lecture(nom24, 4);
-
-	char nom25[] = "../test3/creations/adroite12.wav";
-	base[24] = lecture(nom25, 1);
-	char nom26[] = "../test3/creations/agauche12.wav";
-	base[25] = lecture(nom26, 2);
-	char nom27[] = "../test3/creations/enavant12.wav";
-	base[26] = lecture(nom27, 3);
-	char nom28[] = "../test3/creations/stop12.wav";
-	base[27] = lecture(nom28, 4);
-
-	char nom29[] = "../test3/creations/adroite13.wav";
-	base[28] = lecture(nom29, 1);
-	char nom30[] = "../test3/creations/agauche13.wav";
-	base[29] = lecture(nom30, 2);
-	char nom31[] = "../test3/creations/enavant13.wav";
-	base[30] = lecture(nom31, 3);
-	char nom32[] = "../test3/creations/stop13.wav";
-	base[31] = lecture(nom32, 4);
-
-	char nom33[] = "../test3/creations/adroite14.wav";
-	base[32] = lecture(nom33, 1);
-	char nom34[] = "../test3/creations/agauche14.wav";
-	base[33] = lecture(nom34, 2);
-	char nom35[] = "../test3/creations/enavant14.wav";
-	base[34] = lecture(nom35, 3);
-	char nom36[] = "../test3/creations/stop14.wav";
-	base[35] = lecture(nom36, 4);
+    while (std::getline(f, line)) {
+        strcpy (nom,line.c_str());
+        std::getline(f, line);
+        base[i] = lecture(nom, atoi(line.c_str()));
+        i++;
+        std::cout << "ajout dans la base de : " << nom << std::endl;
+    }
 	
 	clock_t tbase = clock();
 	std::cout << "base crée: " << tbase-start << std::endl;
 
 	// On presente des exemples :
+
+
 	char nom0[50];
 	while(true){
 		std::cin >> nom0;
-		std::cout << "analse de " << nom0 << "..." << std::endl;
-		commande(port, classif(base, l_base, nom0, 5));
+		std::cout << "analyse de " << nom0 << "..." << std::endl;
+        // char play[] = "play ";
+        // char command[100];
+        // strcat(command, play);
+        // strcat(command, nom0);
+        // // std::cout << "b " << command << std::endl;
+        // auto b = system(command);
+		commande(port, classif(base, l_base, nom0, 1));
 	}
+
+
+
+
 	// {
 	// 	char nom0[] = "../test3/creations/adroite6.wav";
 	// 	int classe = classif(base, l_base, nom0, 2);
@@ -353,7 +270,7 @@ int main(int argc, char *argv[]) {
  //    }   	
  //    {
 	// 	char nom0[] = "../test3/creations/stop6.wav";
-	// 	int classe = classif(base, l_base, nom0, 2);
+	// 	int classe = classif(base, l_base, nom0, 3);
 	// 	commande(port, classe);
  //    }
 
